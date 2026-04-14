@@ -3,11 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>InstaIQ — Instagram Account Intelligence</title>
+<title>InstaIQ — Instagram Growth Intelligence</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Mono:wght@400;500&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
 <style>
+/* ══════════════════════════════════
+   DESIGN TOKENS
+══════════════════════════════════ */
 :root{
   --bg:#07070e;--bg2:#0d0b18;--bg3:#141126;--bg4:#1a1730;
   --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.12);
@@ -24,21 +27,60 @@
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth}
 body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
- 
-/* NOISE TEXTURE */
 body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
   background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");
   background-size:200px}
- 
-/* IG GRADIENT BORDER UTILITY */
-.ig-border-box{border:2px solid transparent;background-clip:padding-box;position:relative}
-.ig-border-box::before{content:'';position:absolute;inset:-2px;border-radius:inherit;z-index:-1;background:var(--ig-border);opacity:0;transition:opacity .3s}
-.ig-border-box:hover::before{opacity:1}
- 
-/* ════ NAV ════ */
+
+/* ══════════════════════════════════
+   LOGIN SCREEN
+══════════════════════════════════ */
+#loginScreen{position:fixed;inset:0;z-index:500;display:flex;align-items:center;justify-content:center;
+  padding:24px;background:var(--bg);overflow-y:auto}
+.ls-orbs{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.ls-orb{position:absolute;border-radius:50%;filter:blur(90px);animation:float-orb 8s ease-in-out infinite alternate}
+.ls-orb1{width:400px;height:400px;background:radial-gradient(circle,rgba(131,58,180,.35),transparent);top:-10%;left:-5%;animation-delay:0s}
+.ls-orb2{width:350px;height:350px;background:radial-gradient(circle,rgba(225,48,108,.25),transparent);bottom:-10%;right:-5%;animation-delay:-4s}
+.ls-card{position:relative;z-index:1;background:var(--bg2);border:1px solid var(--border2);border-radius:24px;
+  padding:48px 44px;max-width:480px;width:100%;text-align:center;
+  box-shadow:0 32px 80px rgba(0,0,0,.7);animation:fadeUp .5s ease}
+.ls-logo-wrap{display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:28px}
+.ls-logo{font-family:'Syne',sans-serif;font-size:28px;font-weight:800;letter-spacing:-.5px;
+  background:var(--ig);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.ls-logo-dot{width:9px;height:9px;border-radius:50%;background:var(--ig);flex-shrink:0}
+.ls-avatar-wrap{width:80px;height:80px;border-radius:50%;background:var(--ig);margin:0 auto 20px;
+  display:flex;align-items:center;justify-content:center;font-size:36px;
+  box-shadow:0 8px 32px rgba(225,48,108,.35)}
+.ls-title{font-family:'Syne',sans-serif;font-size:24px;font-weight:800;letter-spacing:-.5px;
+  color:var(--text);margin-bottom:10px}
+.ls-sub{font-size:14px;color:var(--text2);line-height:1.65;margin-bottom:28px;max-width:340px;margin-left:auto;margin-right:auto}
+.ls-input-wrap{display:flex;align-items:center;background:var(--bg3);border:1px solid var(--border2);
+  border-radius:var(--radius-sm);padding:4px 4px 4px 16px;margin-bottom:14px;transition:border-color .25s}
+.ls-input-wrap:focus-within{border-color:rgba(225,48,108,.6);box-shadow:0 0 0 3px rgba(225,48,108,.08)}
+.ls-at{font-family:'DM Mono',monospace;font-size:16px;color:var(--muted);flex-shrink:0}
+.ls-input{flex:1;background:transparent;border:none;outline:none;color:var(--text);
+  font-family:'DM Mono',monospace;font-size:15px;padding:10px 12px;letter-spacing:.3px}
+.ls-input::placeholder{color:var(--muted)}
+.ls-btn{width:100%;background:var(--ig);color:#fff;border:none;border-radius:var(--radius-sm);
+  padding:15px;font-family:'Syne',sans-serif;font-size:17px;font-weight:800;letter-spacing:-.2px;
+  cursor:pointer;transition:transform .2s,box-shadow .2s;margin-bottom:20px}
+.ls-btn:hover{transform:translateY(-2px);box-shadow:0 10px 32px rgba(225,48,108,.45)}
+.ls-divider{display:flex;align-items:center;gap:14px;margin-bottom:18px}
+.ls-divider::before,.ls-divider::after{content:'';flex:1;height:1px;background:var(--border2)}
+.ls-divider span{font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);letter-spacing:1px}
+.ls-demos{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:22px}
+.ls-demo-btn{background:var(--bg3);border:1px solid var(--border2);color:var(--text2);
+  border-radius:20px;padding:7px 14px;font-family:'DM Mono',monospace;font-size:12px;
+  cursor:pointer;transition:all .2s;letter-spacing:.3px}
+.ls-demo-btn:hover{border-color:var(--pink);color:var(--pink);background:var(--pink-dim)}
+.ls-note{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:.5px;line-height:1.6}
+.ls-err{font-family:'DM Mono',monospace;font-size:11px;color:var(--pink);margin-top:8px;min-height:16px;text-align:center}
+
+/* ══════════════════════════════════
+   NAV
+══════════════════════════════════ */
 nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;
   justify-content:space-between;padding:0 40px;height:66px;
-  background:rgba(7,7,14,0.85);backdrop-filter:blur(24px) saturate(1.8);
+  background:rgba(7,7,14,.88);backdrop-filter:blur(24px) saturate(1.8);
   border-bottom:1px solid var(--border)}
 .nav-logo{font-family:'Syne',sans-serif;font-size:24px;font-weight:800;letter-spacing:-.5px;
   background:var(--ig);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
@@ -46,18 +88,22 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:cen
   background:var(--ig);margin-left:3px;vertical-align:middle;position:relative;top:-2px}
 .nav-right{display:flex;align-items:center;gap:12px}
 .nav-badge{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1.5px;
-  padding:4px 12px;border-radius:20px;border:1px solid rgba(131,58,180,0.4);
-  color:var(--purple);background:rgba(131,58,180,0.1)}
-.btn-api-setup{display:flex;align-items:center;gap:8px;background:var(--bg3);
-  border:1px solid var(--border2);color:var(--text);border-radius:var(--radius-sm);
-  padding:8px 18px;font-family:'Outfit',sans-serif;font-size:13px;font-weight:500;cursor:pointer;
-  transition:all .2s}
-.btn-api-setup:hover{border-color:var(--purple);color:var(--purple)}
-.api-status-dot{width:7px;height:7px;border-radius:50%;background:var(--muted);flex-shrink:0;transition:background .3s}
-.api-status-dot.live{background:var(--green);box-shadow:0 0 6px var(--green)}
- 
-/* ════ HERO ════ */
-#hero{position:relative;z-index:1;min-height:100vh;display:flex;flex-direction:column;
+  padding:4px 12px;border-radius:20px;border:1px solid rgba(131,58,180,.4);
+  color:var(--purple);background:rgba(131,58,180,.1)}
+.nav-user-pill{display:none;align-items:center;gap:9px;background:var(--bg3);
+  border:1px solid rgba(225,48,108,.25);border-radius:var(--radius-sm);
+  padding:7px 14px;font-family:'DM Mono',monospace;font-size:12px;color:var(--pink)}
+.nav-user-pill.show{display:flex}
+.nav-user-avatar{width:26px;height:26px;border-radius:50%;background:var(--ig);
+  display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;flex-shrink:0}
+.nav-logout{background:none;border:none;color:var(--muted);cursor:pointer;
+  font-size:14px;transition:color .2s;margin-left:4px;padding:2px}
+.nav-logout:hover{color:var(--pink)}
+
+/* ══════════════════════════════════
+   HERO
+══════════════════════════════════ */
+#hero{display:none;position:relative;z-index:1;min-height:100vh;flex-direction:column;
   align-items:center;justify-content:center;text-align:center;padding:100px 24px 80px}
 .hero-bg{position:absolute;inset:0;pointer-events:none;overflow:hidden}
 .hero-orb{position:absolute;border-radius:50%;filter:blur(80px);opacity:.35;animation:float-orb 8s ease-in-out infinite alternate}
@@ -65,63 +111,67 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:cen
 .hero-orb2{width:400px;height:400px;background:radial-gradient(circle,#E1306C,transparent);top:30%;right:15%;animation-delay:-3s}
 .hero-orb3{width:350px;height:350px;background:radial-gradient(circle,#F77737,transparent);bottom:15%;left:35%;animation-delay:-6s}
 @keyframes float-orb{from{transform:translate(0,0) scale(1)}to{transform:translate(30px,20px) scale(1.1)}}
+.hero-greeting{font-family:'DM Mono',monospace;font-size:12px;letter-spacing:2px;
+  color:var(--green);margin-bottom:16px;animation:fadeUp .4s ease both}
 .hero-eyebrow{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:3px;
-  color:var(--pink);border:1px solid rgba(225,48,108,0.35);padding:5px 16px;border-radius:20px;
-  background:rgba(225,48,108,0.08);display:inline-block;margin-bottom:28px;
-  animation:fadeUp .5s ease both}
+  color:var(--pink);border:1px solid rgba(225,48,108,.35);padding:5px 16px;border-radius:20px;
+  background:rgba(225,48,108,.08);display:inline-block;margin-bottom:26px;
+  animation:fadeUp .5s .05s ease both}
 .hero-title{font-family:'Syne',sans-serif;font-size:clamp(52px,8vw,100px);font-weight:800;
-  line-height:.92;letter-spacing:-2px;margin-bottom:24px;animation:fadeUp .6s .08s ease both}
+  line-height:.92;letter-spacing:-2px;margin-bottom:22px;animation:fadeUp .5s .1s ease both}
 .hero-title .ig-text{background:var(--ig);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
 .hero-sub{font-size:16px;font-weight:300;color:var(--text2);max-width:480px;line-height:1.7;
-  margin-bottom:44px;animation:fadeUp .6s .15s ease both}
-.search-wrap{width:100%;max-width:580px;animation:fadeUp .6s .22s ease both}
-.search-box{display:flex;background:var(--bg2);border-radius:var(--radius);padding:5px;
-  position:relative;overflow:hidden}
-.search-box::before{content:'';position:absolute;inset:0;border-radius:var(--radius);
-  padding:1.5px;background:var(--ig-border);-webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);
+  margin-bottom:40px;animation:fadeUp .5s .15s ease both}
+.search-wrap{width:100%;max-width:580px;animation:fadeUp .5s .2s ease both}
+.search-box{display:flex;background:var(--bg2);border-radius:var(--radius);padding:5px;position:relative;overflow:hidden}
+.search-box::before{content:'';position:absolute;inset:0;border-radius:var(--radius);padding:1.5px;
+  background:var(--ig-border);-webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);
   -webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none}
 .search-box input{flex:1;background:transparent;border:none;outline:none;color:var(--text);
   font-family:'DM Mono',monospace;font-size:14px;padding:12px 18px;letter-spacing:.3px}
 .search-box input::placeholder{color:var(--muted)}
 .btn-analyze{background:var(--ig);color:#fff;border:none;border-radius:var(--radius-sm);
   padding:12px 28px;font-family:'Outfit',sans-serif;font-size:14px;font-weight:700;
-  letter-spacing:.3px;cursor:pointer;transition:transform .2s,box-shadow .2s;white-space:nowrap;flex-shrink:0}
-.btn-analyze:hover{transform:translateY(-1px);box-shadow:0 8px 28px rgba(225,48,108,0.4)}
+  cursor:pointer;transition:transform .2s,box-shadow .2s;white-space:nowrap;flex-shrink:0}
+.btn-analyze:hover{transform:translateY(-1px);box-shadow:0 8px 28px rgba(225,48,108,.4)}
 .hint{font-size:12px;color:var(--muted);margin-top:14px;font-family:'DM Mono',monospace}
 .hint a{color:var(--purple);text-decoration:none;cursor:pointer;transition:color .2s}
 .hint a:hover{color:var(--pink)}
-.hero-features{display:flex;gap:32px;margin-top:64px;animation:fadeUp .6s .35s ease both;flex-wrap:wrap;justify-content:center}
-.hero-feat{text-align:center}
+.hero-features{display:flex;gap:32px;margin-top:60px;animation:fadeUp .5s .3s ease both;flex-wrap:wrap;justify-content:center}
 .hero-feat .num{font-family:'Syne',sans-serif;font-size:32px;font-weight:800;
   background:var(--ig);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
 .hero-feat .lbl{font-size:10px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;
   font-family:'DM Mono',monospace;margin-top:4px}
 @keyframes fadeUp{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:translateY(0)}}
- 
-/* ════ LOADING ════ */
+
+/* ══════════════════════════════════
+   LOADING
+══════════════════════════════════ */
 #loading{display:none;position:fixed;inset:0;z-index:200;background:var(--bg);
-  flex-direction:column;align-items:center;justify-content:center;gap:28px}
-.loader-ig{width:64px;height:64px;border-radius:16px;background:var(--ig);
+  flex-direction:column;align-items:center;justify-content:center;gap:24px}
+.loader-ig{width:64px;height:64px;border-radius:18px;background:var(--ig);
   display:flex;align-items:center;justify-content:center;font-size:28px;
-  animation:spin-scale 2s ease-in-out infinite}
-@keyframes spin-scale{0%,100%{transform:rotate(0deg) scale(1)}50%{transform:rotate(180deg) scale(0.9)}}
-.loader-text{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;letter-spacing:-.5px;
+  animation:spin-scale 2.2s ease-in-out infinite}
+@keyframes spin-scale{0%,100%{transform:rotate(0deg) scale(1)}50%{transform:rotate(180deg) scale(.92)}}
+.loader-label{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;letter-spacing:-.5px;
   background:var(--ig);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-.loader-steps{display:flex;flex-direction:column;gap:10px}
+.loader-steps{display:flex;flex-direction:column;gap:10px;margin-top:4px}
 .step-item{display:flex;align-items:center;gap:10px;font-family:'DM Mono',monospace;
   font-size:12px;color:var(--muted);transition:color .3s}
-.step-item.active{color:var(--pink)} .step-item.done{color:var(--green)}
+.step-item.active{color:var(--pink)}.step-item.done{color:var(--green)}
 .step-dot{width:6px;height:6px;border-radius:50%;background:currentColor;flex-shrink:0}
- 
-/* ════ DASHBOARD ════ */
-#dashboard{display:none;position:relative;z-index:1;padding:90px 24px 120px;max-width:1320px;margin:0 auto}
- 
-/* Profile Header */
-.profile-header{display:flex;align-items:flex-start;gap:24px;margin-bottom:40px;flex-wrap:wrap}
+
+/* ══════════════════════════════════
+   DASHBOARD
+══════════════════════════════════ */
+#dashboard{display:none;position:relative;z-index:1;padding:90px 24px 120px;max-width:1340px;margin:0 auto}
+
+/* Profile header */
+.profile-header{display:flex;align-items:flex-start;gap:22px;margin-bottom:36px;flex-wrap:wrap}
 .profile-avatar-wrap{position:relative;flex-shrink:0}
-.profile-avatar{width:82px;height:82px;border-radius:50%;overflow:hidden;
-  background:var(--bg3);display:flex;align-items:center;justify-content:center;
-  font-family:'Syne',sans-serif;font-size:30px;font-weight:800;color:var(--text)}
+.profile-avatar{width:82px;height:82px;border-radius:50%;overflow:hidden;background:var(--bg3);
+  display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;
+  font-size:30px;font-weight:800;color:var(--text)}
 .avatar-img{width:100%;height:100%;object-fit:cover}
 .avatar-ring{position:absolute;inset:-3px;border-radius:50%;background:var(--ig);z-index:-1}
 .profile-verified{position:absolute;bottom:2px;right:2px;width:22px;height:22px;
@@ -133,132 +183,235 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:cen
 .profile-handle{font-family:'DM Mono',monospace;font-size:13px;color:var(--text2);margin-top:4px}
 .profile-bio{font-size:14px;color:var(--text2);margin-top:10px;line-height:1.6;max-width:500px}
 .profile-badges{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
-.badge-pill{font-family:'DM Mono',monospace;font-size:10px;padding:3px 12px;border-radius:20px;letter-spacing:1px}
-.badge-business{background:rgba(131,58,180,0.15);border:1px solid rgba(131,58,180,0.35);color:var(--purple)}
-.badge-verified{background:rgba(252,175,69,0.12);border:1px solid rgba(252,175,69,0.3);color:var(--yellow)}
-.badge-niche{background:rgba(225,48,108,0.1);border:1px solid rgba(225,48,108,0.3);color:var(--pink)}
-.profile-actions{display:flex;gap:10px;align-self:flex-start;margin-left:auto}
+.badge-pill{font-family:'DM Mono',monospace;font-size:10px;padding:3px 12px;border-radius:20px;letter-spacing:.8px}
+.badge-business{background:rgba(131,58,180,.15);border:1px solid rgba(131,58,180,.35);color:var(--purple)}
+.badge-verified{background:rgba(252,175,69,.12);border:1px solid rgba(252,175,69,.3);color:var(--yellow)}
+.badge-niche{background:rgba(225,48,108,.1);border:1px solid rgba(225,48,108,.3);color:var(--pink)}
+.badge-new{background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.3);color:var(--cyan)}
+.profile-actions{display:flex;gap:10px;align-self:flex-start;margin-left:auto;flex-wrap:wrap}
 .back-btn{background:transparent;border:1px solid var(--border2);color:var(--text2);
   border-radius:var(--radius-sm);padding:10px 20px;font-family:'Outfit',sans-serif;
   font-size:13px;cursor:pointer;transition:all .2s}
 .back-btn:hover{border-color:var(--pink);color:var(--pink)}
- 
+
 /* KPI */
-.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px;margin-bottom:28px}
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(185px,1fr));gap:14px;margin-bottom:26px}
 .kpi-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);
   padding:22px;position:relative;overflow:hidden;transition:transform .2s,border-color .25s;
   animation:fadeUp .5s ease both}
 .kpi-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;
-  background:var(--kpi-accent,var(--ig));opacity:.8}
-.kpi-card:hover{transform:translateY(-3px);border-color:rgba(255,255,255,0.14)}
+  background:var(--kpi-accent,var(--ig));opacity:.85}
+.kpi-card:hover{transform:translateY(-3px);border-color:rgba(255,255,255,.14)}
 .kpi-label{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:2px;
   text-transform:uppercase;color:var(--text2);margin-bottom:10px}
 .kpi-value{font-family:'Syne',sans-serif;font-size:36px;font-weight:800;letter-spacing:-1px;color:var(--text);line-height:1}
 .kpi-sub{font-size:12px;margin-top:6px;font-family:'DM Mono',monospace;color:var(--text2)}
 .kpi-tag{display:inline-block;font-size:10px;padding:2px 8px;border-radius:20px;margin-top:6px;font-family:'DM Mono',monospace}
-.kpi-tag.good{background:rgba(0,229,160,0.12);color:var(--green);border:1px solid rgba(0,229,160,0.25)}
-.kpi-tag.warn{background:rgba(252,175,69,0.12);color:var(--yellow);border:1px solid rgba(252,175,69,0.25)}
-.kpi-tag.bad{background:rgba(225,48,108,0.12);color:var(--pink);border:1px solid rgba(225,48,108,0.25)}
- 
-/* GRIDS */
+.kpi-tag.good{background:rgba(0,229,160,.12);color:var(--green);border:1px solid rgba(0,229,160,.25)}
+.kpi-tag.warn{background:rgba(252,175,69,.12);color:var(--yellow);border:1px solid rgba(252,175,69,.25)}
+.kpi-tag.bad{background:rgba(225,48,108,.12);color:var(--pink);border:1px solid rgba(225,48,108,.25)}
+
+/* Grids */
 .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:18px}
 .grid-3{display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:18px;margin-bottom:18px}
-@media(max-width:960px){.grid-2,.grid-3{grid-template-columns:1fr}nav{padding:0 20px}
-  .profile-header{flex-wrap:wrap}.profile-actions{margin-left:0;width:100%}}
-@media(max-width:600px){.hero-features{gap:20px}}
- 
-/* PANEL */
+@media(max-width:960px){.grid-2,.grid-3{grid-template-columns:1fr}
+  nav{padding:0 20px}.profile-actions{margin-left:0;width:100%}}
+@media(max-width:600px){.hero-features{gap:20px}.ls-card{padding:36px 26px}}
+
+/* Panel */
 .panel{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);
-  padding:26px;animation:fadeUp .5s .1s ease both}
+  padding:26px;animation:fadeUp .5s .1s ease both;margin-bottom:0}
 .panel-title{font-family:'Syne',sans-serif;font-size:16px;font-weight:800;letter-spacing:-.3px;
   color:var(--text);margin-bottom:4px}
 .panel-sub{font-size:11px;color:var(--text2);font-family:'DM Mono',monospace;
-  margin-bottom:18px;letter-spacing:.5px}
- 
-/* NICHE */
+  margin-bottom:18px;letter-spacing:.4px}
+
+/* Niche */
 .niche-icon-wrap{width:52px;height:52px;border-radius:14px;background:var(--ig-soft);
-  border:1px solid rgba(225,48,108,0.2);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0}
-.niche-name{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;letter-spacing:-.5px;color:var(--text)}
+  border:1px solid rgba(225,48,108,.2);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0}
+.niche-name{font-family:'Syne',sans-serif;font-size:21px;font-weight:800;letter-spacing:-.5px;color:var(--text)}
 .niche-conf{font-size:12px;font-family:'DM Mono',monospace;margin-top:4px}
 .niche-conf span{background:var(--ig);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
 .conf-bar-track{height:5px;background:var(--bg4);border-radius:3px;overflow:hidden;margin-top:14px}
 .conf-bar-fill{height:100%;border-radius:3px;background:var(--ig);transition:width 1.4s cubic-bezier(.22,1,.36,1)}
 .niche-tags{display:flex;gap:7px;flex-wrap:wrap;margin-top:14px}
 .tag{font-family:'DM Mono',monospace;font-size:10px;padding:4px 11px;border-radius:20px;
-  background:var(--bg3);border:1px solid var(--border);color:var(--text2);letter-spacing:.3px;cursor:default;transition:all .2s}
-.tag.hl{border-color:rgba(225,48,108,0.4);color:var(--pink);background:rgba(225,48,108,0.08)}
-.tag:hover{border-color:rgba(131,58,180,0.5);color:var(--purple)}
- 
-/* RADAR & DONUT */
+  background:var(--bg3);border:1px solid var(--border);color:var(--text2);cursor:default;transition:all .2s}
+.tag.hl{border-color:rgba(225,48,108,.4);color:var(--pink);background:rgba(225,48,108,.08)}
+.tag:hover{border-color:rgba(131,58,180,.5);color:var(--purple)}
+
+/* Charts */
 .chart-center{display:flex;align-items:center;justify-content:center;height:230px}
 canvas{max-width:100%}
- 
-/* APRIORI RULES */
+
+/* Apriori rules */
 .rule-list{display:flex;flex-direction:column;gap:9px}
 .rule-item{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);
   padding:13px 15px;display:grid;grid-template-columns:1fr auto auto;align-items:center;
   gap:10px;transition:border-color .2s,transform .2s;cursor:default}
-.rule-item:hover{border-color:rgba(131,58,180,0.3);transform:translateX(4px)}
+.rule-item:hover{border-color:rgba(131,58,180,.35);transform:translateX(4px)}
 .rule-ant{font-family:'DM Mono',monospace;font-size:11px;color:var(--text2)}
-.rule-ant .bold{color:var(--text)}
-.rule-arrow{color:var(--pink);margin:0 5px}
-.rule-con{color:var(--purple)}
-.rule-conf{font-family:'DM Mono',monospace;font-size:11px;color:var(--green);white-space:nowrap}
+.rule-ant .bold{color:var(--text)}.rule-arrow{color:var(--pink);margin:0 4px}
+.rule-con{color:var(--purple)}.rule-conf{font-family:'DM Mono',monospace;font-size:11px;color:var(--green);white-space:nowrap}
 .rule-lift{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted)}
- 
-/* HASHTAG CLOUD */
+
+/* Hashtag cloud */
 .hashtag-cloud{display:flex;flex-wrap:wrap;gap:8px;padding:4px 0}
 .htag{font-family:'DM Mono',monospace;border-radius:20px;padding:5px 13px;
   background:var(--bg3);border:1px solid var(--border);cursor:default;transition:all .2s;white-space:nowrap}
 .htag:hover{transform:scale(1.05)}
-.htag.s1{font-size:10px;color:var(--text2)}
-.htag.s2{font-size:12px;color:var(--text);border-color:rgba(131,58,180,0.3)}
-.htag.s3{font-size:14px;color:var(--purple);border-color:rgba(131,58,180,0.5);background:rgba(131,58,180,0.08)}
-.htag.s4{font-size:16px;color:var(--pink);border-color:rgba(225,48,108,0.5);background:rgba(225,48,108,0.08);font-weight:500}
- 
-/* PERF TABLE */
+.htag.s1{font-size:10px;color:var(--text2)}.htag.s2{font-size:12px;color:var(--text);border-color:rgba(131,58,180,.3)}
+.htag.s3{font-size:14px;color:var(--purple);border-color:rgba(131,58,180,.5);background:rgba(131,58,180,.08)}
+.htag.s4{font-size:16px;color:var(--pink);border-color:rgba(225,48,108,.5);background:rgba(225,48,108,.08);font-weight:500}
+
+/* Performance table */
 .perf-table{width:100%;border-collapse:collapse;font-size:13px}
 .perf-table th{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;
   color:var(--muted);text-align:left;padding:0 14px 12px;border-bottom:1px solid var(--border)}
-.perf-table td{padding:11px 14px;border-bottom:1px solid rgba(255,255,255,0.03);font-family:'DM Mono',monospace}
-.perf-table tr:hover td{background:rgba(131,58,180,0.04)}
+.perf-table td{padding:11px 14px;border-bottom:1px solid rgba(255,255,255,.03);font-family:'DM Mono',monospace}
+.perf-table tr:hover td{background:rgba(131,58,180,.04)}
 .perf-table .title-cell{color:var(--text);font-family:'Outfit',sans-serif;max-width:220px;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .post-type-badge{display:inline-flex;align-items:center;gap:4px;font-family:'DM Mono',monospace;
   font-size:10px;padding:2px 9px;border-radius:20px}
-.type-photo{background:rgba(131,58,180,0.12);color:var(--purple);border:1px solid rgba(131,58,180,0.25)}
-.type-reel{background:rgba(225,48,108,0.1);color:var(--pink);border:1px solid rgba(225,48,108,0.25)}
-.type-carousel{background:rgba(247,119,55,0.1);color:var(--orange);border:1px solid rgba(247,119,55,0.25)}
+.type-photo{background:rgba(131,58,180,.12);color:var(--purple);border:1px solid rgba(131,58,180,.25)}
+.type-reel{background:rgba(225,48,108,.1);color:var(--pink);border:1px solid rgba(225,48,108,.25)}
+.type-carousel{background:rgba(247,119,55,.1);color:var(--orange);border:1px solid rgba(247,119,55,.25)}
+.type-video{background:rgba(0,212,255,.1);color:var(--cyan);border:1px solid rgba(0,212,255,.25)}
 .eng-badge{display:inline-block;padding:2px 10px;border-radius:20px;font-size:10px;font-family:'DM Mono',monospace}
-.eng-high{background:rgba(0,229,160,0.1);color:var(--green);border:1px solid rgba(0,229,160,0.2)}
-.eng-mid{background:rgba(252,175,69,0.1);color:var(--yellow);border:1px solid rgba(252,175,69,0.2)}
-.eng-low{background:rgba(225,48,108,0.1);color:var(--pink);border:1px solid rgba(225,48,108,0.2)}
- 
-/* BEST TIMES */
-.times-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
-.day-col{display:flex;flex-direction:column;gap:4px;align-items:center}
-.day-lbl{font-family:'DM Mono',monospace;font-size:9px;color:var(--text2);letter-spacing:1px;margin-bottom:2px}
-.hour-block{width:100%;height:10px;border-radius:2px;background:var(--bg4);transition:background .3s}
-.hour-block.heat1{background:rgba(131,58,180,0.25)} .hour-block.heat2{background:rgba(225,48,108,0.4)}
-.hour-block.heat3{background:rgba(247,119,55,0.6)} .hour-block.heat4{background:var(--ig)}
- 
-/* CHATBOT */
+.eng-high{background:rgba(0,229,160,.1);color:var(--green);border:1px solid rgba(0,229,160,.2)}
+.eng-mid{background:rgba(252,175,69,.1);color:var(--yellow);border:1px solid rgba(252,175,69,.2)}
+.eng-low{background:rgba(225,48,108,.1);color:var(--pink);border:1px solid rgba(225,48,108,.2)}
+
+/* Heatmap */
+.hour-block{width:100%;height:14px;border-radius:3px;background:var(--bg4);transition:background .3s}
+.hour-block.heat1{background:rgba(131,58,180,.3)}.hour-block.heat2{background:rgba(225,48,108,.45)}
+.hour-block.heat3{background:rgba(247,119,55,.65)}.hour-block.heat4{background:var(--ig)}
+
+/* ══════════════════════════════════
+   AI GROWTH STRATEGY PANEL
+══════════════════════════════════ */
+.growth-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px}
+.ai-badge{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1.5px;
+  padding:3px 10px;border-radius:20px;border:1px solid rgba(0,212,255,.35);
+  color:var(--cyan);background:rgba(0,212,255,.08)}
+.ai-loading{display:flex;align-items:center;gap:10px;padding:20px 0;
+  font-family:'DM Mono',monospace;font-size:12px;color:var(--text2)}
+.ai-spinner{width:18px;height:18px;border:2px solid var(--border2);border-top-color:var(--pink);
+  border-radius:50%;animation:spin 1s linear infinite;flex-shrink:0}
+@keyframes spin{to{transform:rotate(360deg)}}
+.strategy-list{display:flex;flex-direction:column;gap:10px}
+.strategy-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);
+  padding:16px 18px;display:grid;grid-template-columns:auto 1fr;gap:14px;align-items:flex-start;
+  transition:border-color .25s,transform .2s;cursor:default}
+.strategy-card:hover{border-color:rgba(225,48,108,.3);transform:translateX(3px)}
+.strategy-icon-wrap{width:40px;height:40px;border-radius:10px;background:var(--ig-soft);
+  border:1px solid rgba(225,48,108,.15);display:flex;align-items:center;justify-content:center;
+  font-size:18px;flex-shrink:0}
+.strategy-meta{display:flex;align-items:center;gap:8px;margin-bottom:5px}
+.strategy-title{font-family:'Syne',sans-serif;font-size:14px;font-weight:800;letter-spacing:-.2px;color:var(--text)}
+.priority-badge{font-family:'DM Mono',monospace;font-size:9px;padding:2px 8px;border-radius:20px;letter-spacing:1px}
+.priority-CRITICAL{background:rgba(225,48,108,.18);color:var(--pink);border:1px solid rgba(225,48,108,.35)}
+.priority-HIGH{background:rgba(247,119,55,.15);color:var(--orange);border:1px solid rgba(247,119,55,.3)}
+.priority-MED{background:rgba(131,58,180,.15);color:var(--purple);border:1px solid rgba(131,58,180,.3)}
+.priority-LOW{background:rgba(0,229,160,.1);color:var(--green);border:1px solid rgba(0,229,160,.25)}
+.priority-MAINTAIN{background:rgba(0,229,160,.1);color:var(--green);border:1px solid rgba(0,229,160,.25)}
+.strategy-desc{font-size:13px;color:var(--text2);line-height:1.6}
+
+/* Starter plan */
+.starter-banner{background:linear-gradient(135deg,rgba(131,58,180,.2),rgba(225,48,108,.12));
+  border:1px solid rgba(225,48,108,.3);border-radius:var(--radius-sm);padding:16px 20px;
+  margin-bottom:16px;display:flex;align-items:center;gap:14px}
+.starter-icon{font-size:28px;flex-shrink:0}
+.starter-text h4{font-family:'Syne',sans-serif;font-size:16px;font-weight:800;letter-spacing:-.3px;color:var(--text);margin-bottom:4px}
+.starter-text p{font-size:13px;color:var(--text2);line-height:1.5}
+
+/* ══════════════════════════════════
+   CONTENT IDEAS
+══════════════════════════════════ */
+.ideas-tabs{display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap}
+.ideas-tab{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.5px;
+  padding:6px 14px;border-radius:20px;border:1px solid var(--border);color:var(--text2);
+  cursor:pointer;transition:all .2s;background:var(--bg3)}
+.ideas-tab.active{background:var(--ig);color:#fff;border-color:transparent}
+.ideas-section{display:none}.ideas-section.active{display:flex;flex-direction:column;gap:9px}
+.idea-item{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);
+  padding:13px 16px;transition:border-color .2s,transform .2s;cursor:default}
+.idea-item:hover{border-color:rgba(131,58,180,.35);transform:translateX(3px)}
+.idea-num{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:1px;margin-bottom:4px}
+.idea-text{font-size:13px;color:var(--text);line-height:1.5}
+.idea-hook{font-family:'DM Mono',monospace;font-size:12px;color:var(--pink);
+  background:rgba(225,48,108,.08);border:1px solid rgba(225,48,108,.2);
+  border-radius:var(--radius-xs);padding:10px 14px;cursor:pointer;transition:all .2s;
+  line-height:1.5}
+.idea-hook:hover{background:rgba(225,48,108,.15)}
+
+/* ══════════════════════════════════
+   WEEKLY POSTING PLAN
+══════════════════════════════════ */
+.plan-grid{display:flex;flex-direction:column;gap:8px}
+.plan-day{display:flex;align-items:center;gap:12px;padding:10px 14px;
+  background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);
+  transition:border-color .2s}
+.plan-day.active-day{border-color:rgba(225,48,108,.4);background:rgba(225,48,108,.06)}
+.plan-day-name{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1px;
+  color:var(--text2);width:32px;flex-shrink:0}
+.plan-day.active-day .plan-day-name{color:var(--pink)}
+.plan-slot{display:flex;flex-wrap:wrap;gap:6px;flex:1}
+.plan-chip{font-family:'DM Mono',monospace;font-size:10px;padding:3px 10px;border-radius:20px;letter-spacing:.3px}
+.plan-chip-reel{background:rgba(225,48,108,.12);color:var(--pink);border:1px solid rgba(225,48,108,.25)}
+.plan-chip-post{background:rgba(131,58,180,.12);color:var(--purple);border:1px solid rgba(131,58,180,.25)}
+.plan-chip-story{background:rgba(247,119,55,.1);color:var(--orange);border:1px solid rgba(247,119,55,.25)}
+.plan-chip-rest{background:var(--bg4);color:var(--muted);border:1px solid var(--border)}
+.plan-time{font-family:'DM Mono',monospace;font-size:10px;color:var(--text2);
+  white-space:nowrap;margin-left:auto;flex-shrink:0}
+
+/* ══════════════════════════════════
+   VIRAL TIPS
+══════════════════════════════════ */
+.tips-grid{display:flex;flex-direction:column;gap:9px}
+.tip-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);
+  padding:14px 16px;display:flex;align-items:flex-start;gap:12px;transition:border-color .2s,transform .2s}
+.tip-card:hover{border-color:rgba(247,119,55,.35);transform:translateX(3px)}
+.tip-icon{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,rgba(247,119,55,.2),rgba(252,175,69,.12));
+  border:1px solid rgba(247,119,55,.2);display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+.tip-content{flex:1}
+.tip-title{font-family:'Syne',sans-serif;font-size:13px;font-weight:800;letter-spacing:-.2px;color:var(--text);margin-bottom:3px}
+.tip-desc{font-size:12px;color:var(--text2);line-height:1.55}
+
+/* Hashtag sets */
+.htag-set{margin-bottom:14px}
+.htag-set-label{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1.5px;
+  text-transform:uppercase;color:var(--text2);margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.htag-set-count{font-size:9px;padding:1px 7px;border-radius:10px;
+  background:var(--bg4);border:1px solid var(--border);color:var(--muted)}
+.htag-set-tags{display:flex;flex-wrap:wrap;gap:6px}
+.htag-set-tag{font-family:'DM Mono',monospace;font-size:11px;padding:4px 11px;border-radius:20px;
+  background:var(--bg4);border:1px solid var(--border);color:var(--text2);
+  cursor:pointer;transition:all .2s}
+.htag-set-tag:hover{border-color:var(--pink);color:var(--pink)}
+.copy-all-btn{width:100%;margin-top:10px;background:transparent;border:1px solid rgba(225,48,108,.3);
+  color:var(--pink);border-radius:var(--radius-sm);padding:10px;font-family:'DM Mono',monospace;
+  font-size:11px;letter-spacing:1px;cursor:pointer;transition:all .2s}
+.copy-all-btn:hover{background:rgba(225,48,108,.08)}
+
+/* ══════════════════════════════════
+   CHAT
+══════════════════════════════════ */
 .chat-fab{position:fixed;bottom:32px;right:32px;z-index:300;width:60px;height:60px;border-radius:50%;
-  border:none;cursor:pointer;background:var(--ig);box-shadow:0 8px 32px rgba(225,48,108,0.45);
+  border:none;cursor:pointer;background:var(--ig);box-shadow:0 8px 32px rgba(225,48,108,.45);
   display:none;align-items:center;justify-content:center;transition:transform .2s;font-size:22px}
-.chat-fab:hover{transform:scale(1.1)}
-.chat-fab.visible{display:flex}
+.chat-fab:hover{transform:scale(1.1)}.chat-fab.visible{display:flex}
 .chat-notif{position:absolute;top:-3px;right:-3px;width:17px;height:17px;background:var(--green);
   border-radius:50%;border:2px solid var(--bg);font-size:9px;color:var(--bg);
   display:flex;align-items:center;justify-content:center;font-weight:700}
 .chat-panel{position:fixed;bottom:108px;right:32px;z-index:300;width:400px;
   max-width:calc(100vw - 48px);background:var(--bg2);border:1px solid var(--border2);
-  border-radius:20px;box-shadow:0 24px 80px rgba(0,0,0,0.7);display:none;
+  border-radius:20px;box-shadow:0 24px 80px rgba(0,0,0,.7);display:none;
   flex-direction:column;overflow:hidden;animation:chatIn .3s ease}
 .chat-panel.open{display:flex}
 @keyframes chatIn{from{opacity:0;transform:translateY(16px) scale(.96)}to{opacity:1;transform:none}}
-.chat-head{padding:15px 18px;border-bottom:1px solid var(--border);
-  display:flex;align-items:center;gap:12px}
+.chat-head{padding:15px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px}
 .chat-head-icon{width:34px;height:34px;border-radius:10px;background:var(--ig);
   display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
 .chat-head-name{font-family:'Syne',sans-serif;font-size:15px;font-weight:800;letter-spacing:-.3px;color:var(--text)}
@@ -266,17 +419,14 @@ canvas{max-width:100%}
 .chat-close{margin-left:auto;background:none;border:none;color:var(--muted);cursor:pointer;font-size:17px;transition:color .2s;padding:4px}
 .chat-close:hover{color:var(--text)}
 .chat-msgs{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px;max-height:300px}
-.chat-msgs::-webkit-scrollbar{width:3px}
-.chat-msgs::-webkit-scrollbar-thumb{background:var(--muted);border-radius:2px}
-.msg{display:flex;gap:8px;animation:fadeUp .2s ease}
-.msg.user{flex-direction:row-reverse}
+.chat-msgs::-webkit-scrollbar{width:3px}.chat-msgs::-webkit-scrollbar-thumb{background:var(--muted);border-radius:2px}
+.msg{display:flex;gap:8px;animation:fadeUp .2s ease}.msg.user{flex-direction:row-reverse}
 .msg-bubble{max-width:84%;padding:10px 14px;border-radius:14px;font-size:13px;line-height:1.5}
 .msg.bot .msg-bubble{background:var(--bg3);border:1px solid var(--border);color:var(--text);border-radius:14px 14px 14px 4px}
 .msg.user .msg-bubble{background:var(--ig);color:#fff;border-radius:14px 14px 4px 14px}
 .msg-avatar{width:26px;height:26px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px}
-.msg.bot .msg-avatar{background:var(--ig)} .msg.user .msg-avatar{background:var(--bg3);border:1px solid var(--border);color:var(--text2)}
-.chat-typing{display:none;gap:4px;padding:4px 0}
-.chat-typing.show{display:flex}
+.msg.bot .msg-avatar{background:var(--ig)}.msg.user .msg-avatar{background:var(--bg3);border:1px solid var(--border);color:var(--text2)}
+.chat-typing{display:none;gap:4px;padding:4px 0}.chat-typing.show{display:flex}
 .chat-typing span{width:5px;height:5px;background:var(--muted);border-radius:50%;animation:blink 1.2s infinite}
 .chat-typing span:nth-child(2){animation-delay:.2s}.chat-typing span:nth-child(3){animation-delay:.4s}
 @keyframes blink{0%,80%,100%{opacity:.25}40%{opacity:1}}
@@ -288,116 +438,116 @@ canvas{max-width:100%}
 .chat-input{flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:10px;
   padding:10px 13px;color:var(--text);font-family:'Outfit',sans-serif;font-size:13px;
   outline:none;resize:none;max-height:80px;transition:border-color .2s}
-.chat-input:focus{border-color:rgba(225,48,108,0.5)}.chat-input::placeholder{color:var(--muted)}
+.chat-input:focus{border-color:rgba(225,48,108,.5)}.chat-input::placeholder{color:var(--muted)}
 .chat-send{background:var(--ig);border:none;border-radius:10px;width:38px;height:38px;
   color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;
   font-size:15px;transition:transform .15s,opacity .15s;flex-shrink:0;align-self:flex-end}
 .chat-send:hover{transform:scale(1.06)}.chat-send:disabled{opacity:.4;cursor:default}
- 
-/* API KEY MODAL */
-.modal-overlay{display:none;position:fixed;inset:0;z-index:400;
-  background:rgba(7,7,14,0.9);backdrop-filter:blur(16px);align-items:center;justify-content:center;padding:24px}
-.modal-overlay.open{display:flex}
-.modal-box{background:var(--bg2);border:1px solid var(--border2);border-radius:22px;
-  padding:40px;max-width:500px;width:100%;animation:fadeUp .3s ease;position:relative}
-.modal-box::before{content:'';position:absolute;inset:-1px;border-radius:22px;z-index:-1;
-  background:var(--ig-border);opacity:.2;border-radius:22px}
-.modal-title{font-family:'Syne',sans-serif;font-size:26px;font-weight:800;letter-spacing:-1px;
-  margin-bottom:8px;background:var(--ig);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-.modal-sub{font-size:14px;color:var(--text2);line-height:1.6;margin-bottom:22px}
-.modal-close{background:none;border:none;color:var(--muted);cursor:pointer;position:absolute;
-  top:20px;right:20px;font-size:18px;transition:color .2s;padding:4px}
-.modal-close:hover{color:var(--text)}
-.field-label{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;
-  color:var(--text2);display:block;margin-bottom:8px}
-.field-input{width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius-sm);
-  color:var(--text);font-family:'DM Mono',monospace;font-size:13px;padding:13px 16px;outline:none;transition:border-color .2s}
-.field-input:focus{border-color:rgba(225,48,108,0.6)}
-.field-input::placeholder{color:var(--muted)}
-.btn-save-key{width:100%;background:var(--ig);color:#fff;border:none;border-radius:var(--radius-sm);
-  padding:14px;font-family:'Syne',sans-serif;font-size:16px;font-weight:800;letter-spacing:-.3px;
-  cursor:pointer;margin-top:14px;transition:transform .2s,opacity .2s}
-.btn-save-key:hover{transform:translateY(-1px);opacity:.92}
-.key-status-msg{font-family:'DM Mono',monospace;font-size:11px;margin-top:10px;min-height:16px;letter-spacing:.5px}
-.modal-steps{background:var(--bg3);border-radius:var(--radius-sm);padding:16px;margin-bottom:18px;border:1px solid var(--border)}
-.modal-step{display:flex;gap:10px;margin-bottom:10px;font-size:13px;color:var(--text2);line-height:1.5;align-items:flex-start}
-.modal-step:last-child{margin-bottom:0}
-.step-num{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;
-  background:var(--ig);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1;flex-shrink:0;width:22px}
-.modal-step a{color:var(--purple);text-decoration:none}
-.modal-step a:hover{color:var(--pink);text-decoration:underline}
-.modal-note{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);margin-top:12px;letter-spacing:.3px;text-align:center}
- 
-/* SCROLLBAR */
+
+/* Misc */
 ::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--muted);border-radius:3px}
- 
-/* FOOTER */
 footer{text-align:center;padding:40px 24px;font-size:11px;color:var(--muted);
   font-family:'DM Mono',monospace;border-top:1px solid var(--border);position:relative;z-index:1;letter-spacing:.5px}
 footer .ig-foot{background:var(--ig);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(60px);z-index:600;
+  background:var(--bg3);border:1px solid rgba(0,229,160,.3);color:var(--green);
+  font-family:'DM Mono',monospace;font-size:12px;letter-spacing:.5px;padding:10px 20px;border-radius:20px;
+  transition:transform .3s;pointer-events:none}
+.toast.show{transform:translateX(-50%) translateY(0)}
 </style>
 </head>
 <body>
- 
-<!-- NAV -->
-<nav>
+
+<!-- ══ LOGIN SCREEN ══ -->
+<div id="loginScreen">
+  <div class="ls-orbs">
+    <div class="ls-orb ls-orb1"></div>
+    <div class="ls-orb ls-orb2"></div>
+  </div>
+  <div class="ls-card">
+    <div class="ls-logo-wrap">
+      <div class="ls-logo">InstaIQ</div>
+      <div class="ls-logo-dot"></div>
+    </div>
+    <div class="ls-avatar-wrap">📸</div>
+    <h2 class="ls-title">CONNECT YOUR INSTAGRAM</h2>
+    <p class="ls-sub">Enter your Instagram username to analyze your account and unlock AI-powered growth strategies personalized for you.</p>
+    <div class="ls-input-wrap">
+      <span class="ls-at">@</span>
+      <input type="text" id="loginInput" class="ls-input" placeholder="your.username" spellcheck="false"
+        autocomplete="off" onkeydown="if(event.key==='Enter')doLogin()">
+    </div>
+    <div class="ls-err" id="loginErr"></div>
+    <button class="ls-btn" style="margin-top:14px" onclick="doLogin()">CONNECT & ANALYZE →</button>
+    <div class="ls-divider" style="margin-top:6px"><span>OR TRY A DEMO ACCOUNT</span></div>
+    <div class="ls-demos">
+      <button class="ls-demo-btn" onclick="demoLogin('natgeo')">📷 natgeo</button>
+      <button class="ls-demo-btn" onclick="demoLogin('nasa')">🚀 nasa</button>
+      <button class="ls-demo-btn" onclick="demoLogin('9gag')">😂 9gag</button>
+    </div>
+    <div class="ls-note">🔒 Read-only public data analysis · No password required · Stored locally only</div>
+  </div>
+</div>
+
+<!-- ══ NAV ══ -->
+<nav id="mainNav" style="display:none">
   <div style="display:flex;align-items:center;gap:10px">
     <div class="nav-logo">InstaIQ</div>
     <div class="nav-logo-dot"></div>
   </div>
   <div class="nav-right">
-    <div class="nav-badge">APRIORI · ENGAGEMENT INTELLIGENCE</div>
-    <button class="btn-api-setup" id="apiSetupBtn" onclick="openApiModal()">
-      <span class="api-status-dot" id="apiDot"></span>
-      <span id="apiSetupLabel">Setup API Key</span>
-    </button>
+    <div class="nav-badge">APRIORI · ENGAGEMENT AI</div>
+    <div class="nav-user-pill" id="navUserPill">
+      <div class="nav-user-avatar" id="navUserAvatar">?</div>
+      <span id="navUserName">—</span>
+      <button class="nav-logout" onclick="doLogout()" title="Sign out">✕</button>
+    </div>
   </div>
 </nav>
- 
-<!-- HERO -->
+
+<!-- ══ HERO ══ -->
 <section id="hero">
   <div class="hero-bg">
     <div class="hero-orb hero-orb1"></div>
     <div class="hero-orb hero-orb2"></div>
     <div class="hero-orb hero-orb3"></div>
   </div>
+  <div class="hero-greeting" id="heroGreeting"></div>
   <div class="hero-eyebrow">📊 Instagram Intelligence Platform</div>
-  <h1 class="hero-title">
-    DECODE ANY<br><span class="ig-text">INSTAGRAM</span><br>ACCOUNT
-  </h1>
-  <p class="hero-sub">Enter any Instagram handle to unlock deep engagement analysis, Apriori hashtag rules, content mix insights, and AI-powered growth strategies.</p>
+  <h1 class="hero-title">DECODE ANY<br><span class="ig-text">INSTAGRAM</span><br>ACCOUNT</h1>
+  <p class="hero-sub">Real-time engagement analysis, Apriori hashtag rules, content mix insights, and AI-powered growth strategies.</p>
   <div class="search-wrap">
     <div class="search-box">
       <input type="text" id="accountInput" placeholder="@username or instagram.com/username" spellcheck="false"
-        onkeydown="if(event.key==='Enter')startAnalysis()">
+        autocomplete="off" onkeydown="if(event.key==='Enter')startAnalysis()">
       <button class="btn-analyze" onclick="startAnalysis()">ANALYZE →</button>
     </div>
-    <p class="hint">Requires RapidAPI key · Try: <a onclick="demoLoad('natgeo')">@natgeo</a> · <a onclick="demoLoad('nasa')">@nasa</a> · <a onclick="demoLoad('9gag')">@9gag</a></p>
+    <p class="hint">Try: <a onclick="demoAnalyze('natgeo')">@natgeo</a> · <a onclick="demoAnalyze('nasa')">@nasa</a> · <a onclick="demoAnalyze('9gag')">@9gag</a></p>
   </div>
   <div class="hero-features">
     <div class="hero-feat"><div class="num">97%</div><div class="lbl">Niche Accuracy</div></div>
     <div class="hero-feat"><div class="num">50+</div><div class="lbl">Apriori Rules</div></div>
     <div class="hero-feat"><div class="num">0.9+</div><div class="lbl">Min Confidence</div></div>
-    <div class="hero-feat"><div class="num">Real</div><div class="lbl">Live Data Only</div></div>
+    <div class="hero-feat"><div class="num">Live</div><div class="lbl">Real Data Only</div></div>
   </div>
 </section>
- 
-<!-- LOADING -->
+
+<!-- ══ LOADING ══ -->
 <div id="loading">
   <div class="loader-ig">📸</div>
-  <div class="loader-text">ANALYZING ACCOUNT</div>
+  <div class="loader-label">ANALYZING ACCOUNT</div>
   <div class="loader-steps">
     <div class="step-item" id="s1"><div class="step-dot"></div>Resolving Instagram handle…</div>
     <div class="step-item" id="s2"><div class="step-dot"></div>Fetching profile data via API…</div>
     <div class="step-item" id="s3"><div class="step-dot"></div>Loading recent posts & engagement…</div>
-    <div class="step-item" id="s4"><div class="step-dot"></div>Mining hashtag association rules…</div>
-    <div class="step-item" id="s5"><div class="step-dot"></div>Building intelligence report…</div>
+    <div class="step-item" id="s4"><div class="step-dot"></div>Mining hashtag association rules (Apriori)…</div>
+    <div class="step-item" id="s5"><div class="step-dot"></div>Generating AI growth strategy…</div>
   </div>
 </div>
- 
-<!-- DASHBOARD -->
+
+<!-- ══ DASHBOARD ══ -->
 <div id="dashboard">
- 
+
   <!-- Profile Header -->
   <div class="profile-header">
     <div class="profile-avatar-wrap">
@@ -415,13 +565,13 @@ footer .ig-foot{background:var(--ig);-webkit-background-clip:text;-webkit-text-f
       <button class="back-btn" onclick="goBack()">← NEW ANALYSIS</button>
     </div>
   </div>
- 
+
   <!-- KPIs -->
   <div class="kpi-grid" id="kpiGrid"></div>
- 
+
   <!-- Row 1: Niche | Radar | Content Mix -->
   <div class="grid-3">
-    <div class="panel" id="nichePanel">
+    <div class="panel">
       <div class="panel-title">NICHE CLASSIFICATION</div>
       <div class="panel-sub">J48 DECISION TREE · KEYWORD + CATEGORY ANALYSIS</div>
       <div style="display:flex;align-items:center;gap:14px;margin-bottom:16px">
@@ -448,8 +598,8 @@ footer .ig-foot{background:var(--ig);-webkit-background-clip:text;-webkit-text-f
       <div class="chart-center"><canvas id="donutChart" width="220" height="220"></canvas></div>
     </div>
   </div>
- 
-  <!-- Row 2: Engagement Timeline | Apriori Rules -->
+
+  <!-- Row 2: Timeline | Apriori -->
   <div class="grid-2">
     <div class="panel">
       <div class="panel-title">ENGAGEMENT OVER TIME</div>
@@ -462,8 +612,8 @@ footer .ig-foot{background:var(--ig);-webkit-background-clip:text;-webkit-text-f
       <div class="rule-list" id="ruleList"></div>
     </div>
   </div>
- 
-  <!-- Row 3: Hashtag Analysis | Best Times -->
+
+  <!-- Row 3: Hashtags | Best Times -->
   <div class="grid-2">
     <div class="panel">
       <div class="panel-title">TOP HASHTAGS</div>
@@ -472,11 +622,11 @@ footer .ig-foot{background:var(--ig);-webkit-background-clip:text;-webkit-text-f
     </div>
     <div class="panel">
       <div class="panel-title">BEST POSTING TIMES</div>
-      <div class="panel-sub">ENGAGEMENT HEAT MAP · LOCAL TIME ZONES</div>
-      <div id="heatmapWrap" style="overflow-x:auto;padding-top:8px">
+      <div class="panel-sub">ENGAGEMENT HEAT MAP BY DAY & HOUR</div>
+      <div style="overflow-x:auto;padding-top:8px">
         <div style="min-width:280px">
           <div style="display:flex;gap:6px;margin-bottom:6px">
-            <div style="width:28px"></div>
+            <div style="width:30px"></div>
             <div style="display:flex;gap:2px;flex:1">
               <span style="font-family:DM Mono,monospace;font-size:9px;color:var(--muted);flex:1;text-align:center">6AM</span>
               <span style="font-family:DM Mono,monospace;font-size:9px;color:var(--muted);flex:1;text-align:center">9AM</span>
@@ -490,10 +640,10 @@ footer .ig-foot{background:var(--ig);-webkit-background-clip:text;-webkit-text-f
           <div style="display:flex;align-items:center;gap:10px;margin-top:14px;font-family:DM Mono,monospace;font-size:10px;color:var(--muted)">
             <span>LOW</span>
             <div style="display:flex;gap:3px">
-              <div style="width:12px;height:12px;border-radius:3px;background:rgba(131,58,180,0.25)"></div>
-              <div style="width:12px;height:12px;border-radius:3px;background:rgba(225,48,108,0.4)"></div>
-              <div style="width:12px;height:12px;border-radius:3px;background:rgba(247,119,55,0.6)"></div>
-              <div style="width:12px;height:12px;border-radius:3px;background:var(--ig)"></div>
+              <div style="width:12px;height:12px;border-radius:3px" class="hour-block heat1"></div>
+              <div style="width:12px;height:12px;border-radius:3px" class="hour-block heat2"></div>
+              <div style="width:12px;height:12px;border-radius:3px" class="hour-block heat3"></div>
+              <div style="width:12px;height:12px;border-radius:3px" class="hour-block heat4"></div>
             </div>
             <span>HIGH</span>
           </div>
@@ -501,22 +651,75 @@ footer .ig-foot{background:var(--ig);-webkit-background-clip:text;-webkit-text-f
       </div>
     </div>
   </div>
- 
-  <!-- Recent Posts Table -->
-  <div class="panel" style="margin-bottom:0">
+
+  <!-- ═══ AI GROWTH STRATEGY ═══ -->
+  <div class="panel" style="margin-bottom:18px" id="growthPanel">
+    <div class="growth-header">
+      <div>
+        <div class="panel-title">🧠 AI GROWTH STRATEGY</div>
+        <div class="panel-sub">PERSONALIZED RECOMMENDATIONS BASED ON YOUR REAL DATA</div>
+      </div>
+      <div class="ai-badge" id="aiSourceBadge">GEMINI AI</div>
+    </div>
+    <div id="starterBanner" style="display:none">
+      <div class="starter-banner">
+        <div class="starter-icon">🌱</div>
+        <div class="starter-text">
+          <h4>STARTER GROWTH PLAN ACTIVATED</h4>
+          <p>New or low-data account detected. Here's a complete 30-day blueprint to grow from 0 to 1K followers.</p>
+        </div>
+      </div>
+    </div>
+    <div id="growthStrategies" class="strategy-list">
+      <div class="ai-loading"><div class="ai-spinner"></div>Generating personalized strategy…</div>
+    </div>
+  </div>
+
+  <!-- ═══ CONTENT IDEAS + POSTING PLAN ═══ -->
+  <div class="grid-2" style="margin-bottom:18px">
+    <div class="panel">
+      <div class="panel-title">🚀 CONTENT IDEAS</div>
+      <div class="panel-sub" id="contentIdeasSub">PERSONALIZED FOR YOUR NICHE</div>
+      <div class="ideas-tabs">
+        <div class="ideas-tab active" onclick="switchTab('reels',this)">📽 Reels</div>
+        <div class="ideas-tab" onclick="switchTab('posts',this)">🖼 Posts</div>
+        <div class="ideas-tab" onclick="switchTab('hooks',this)">🎣 Hooks</div>
+      </div>
+      <div id="ideas-reels" class="ideas-section active"></div>
+      <div id="ideas-posts" class="ideas-section"></div>
+      <div id="ideas-hooks" class="ideas-section"></div>
+    </div>
+    <div class="panel">
+      <div class="panel-title">📅 WEEKLY POSTING PLAN</div>
+      <div class="panel-sub">OPTIMAL SCHEDULE BASED ON HEATMAP ANALYSIS</div>
+      <div class="plan-grid" id="postingPlanBody"></div>
+    </div>
+  </div>
+
+  <!-- ═══ VIRAL TIPS + HASHTAG SETS ═══ -->
+  <div class="grid-2" style="margin-bottom:18px">
+    <div class="panel">
+      <div class="panel-title">🔥 VIRAL TIPS</div>
+      <div class="panel-sub">QUICK WINS SPECIFIC TO YOUR ACCOUNT</div>
+      <div class="tips-grid" id="viralTipsBody"></div>
+    </div>
+    <div class="panel">
+      <div class="panel-title">🏷 SMART HASHTAG SETS</div>
+      <div class="panel-sub">COPY-PASTE READY · NICHE OPTIMIZED · 3-TIER STRATEGY</div>
+      <div id="hashtagSetBody"></div>
+    </div>
+  </div>
+
+  <!-- ═══ RECENT POSTS TABLE ═══ -->
+  <div class="panel">
     <div class="panel-title">RECENT POST PERFORMANCE</div>
     <div class="panel-sub">LATEST POSTS WITH REAL ENGAGEMENT DATA</div>
     <div style="overflow-x:auto">
       <table class="perf-table">
         <thead>
           <tr>
-            <th>CAPTION</th>
-            <th>TYPE</th>
-            <th>LIKES</th>
-            <th>COMMENTS</th>
-            <th>ENG RATE</th>
-            <th>TAGS</th>
-            <th>PERFORMANCE</th>
+            <th>CAPTION</th><th>TYPE</th><th>LIKES</th><th>COMMENTS</th>
+            <th>ENG RATE</th><th>TAGS</th><th>PERFORMANCE</th>
           </tr>
         </thead>
         <tbody id="perfBody"></tbody>
@@ -524,13 +727,13 @@ footer .ig-foot{background:var(--ig);-webkit-background-clip:text;-webkit-text-f
     </div>
   </div>
 </div>
- 
-<!-- CHATBOT FAB -->
+
+<!-- ══ CHAT FAB ══ -->
 <button class="chat-fab" id="chatFab" onclick="toggleChat()">
   ✨<div class="chat-notif">AI</div>
 </button>
- 
-<!-- CHAT PANEL -->
+
+<!-- ══ CHAT PANEL ══ -->
 <div class="chat-panel" id="chatPanel">
   <div class="chat-head">
     <div class="chat-head-icon">✨</div>
@@ -549,321 +752,336 @@ footer .ig-foot{background:var(--ig);-webkit-background-clip:text;-webkit-text-f
     <button class="chat-send" id="chatSendBtn" onclick="sendChat()">➤</button>
   </div>
 </div>
- 
-<!-- API KEY MODAL -->
-<div class="modal-overlay" id="apiModal">
-  <div class="modal-box">
-    <button class="modal-close" onclick="closeApiModal()">✕</button>
-    <div class="modal-title">SETUP API KEY</div>
-    <div class="modal-sub">InstaIQ uses RapidAPI to fetch real Instagram data. Get a free key in 60 seconds.</div>
-    <div class="modal-steps">
-      <div class="modal-step"><div class="step-num">1</div><div>Go to <a href="https://rapidapi.com/hub" target="_blank">rapidapi.com</a> and create a free account</div></div>
-      <div class="modal-step"><div class="step-num">2</div><div>Search for <strong style="color:var(--text)">"Instagram Scraper API2"</strong> by pablosantoro and subscribe (free tier available)</div></div>
-      <div class="modal-step"><div class="step-num">3</div><div>Copy your <strong style="color:var(--text)">X-RapidAPI-Key</strong> from the API dashboard and paste below</div></div>
-    </div>
-    <label class="field-label">YOUR RAPIDAPI KEY</label>
-    <input type="password" class="field-input" id="rapidKeyInput" placeholder="e.g. abc123xyz...your key here">
-    <button class="btn-save-key" id="saveKeyBtn" onclick="saveApiKey()">SAVE & VERIFY KEY →</button>
-    <div class="key-status-msg" id="keyStatusMsg"></div>
-    <div class="modal-note">Your key is stored locally in your browser only. We never send it to any server.</div>
-  </div>
-</div>
- 
+
+<div class="toast" id="toast"></div>
+
 <footer>
-  InstaIQ · Instagram Account Intelligence · Real Data via RapidAPI · 
+  InstaIQ · Instagram Account Intelligence · Real Data via RapidAPI ·
   <span class="ig-foot">Apriori Mining · Gemini AI · Built for Creators</span>
 </footer>
- 
+
 <script>
-/* ══════════════════════════════════════════════
-   InstaIQ — Instagram Intelligence Platform
-   Real data · Apriori rules · AI chatbot
-   ══════════════════════════════════════════════ */
- 
-// ─── CONFIG ──────────────────────────────────
-const RAPID_HOST = 'instagram-scraper-api2.p.rapidapi.com';
+/* ══════════════════════════════════════════════════════════
+   InstaIQ v2 — SaaS Instagram Intelligence Platform
+   Updated API · Login System · AI Growth Strategy
+══════════════════════════════════════════════════════════ */
+
+// ─── CONFIG ──────────────────────────────────────────────
+const RAPID_HOST = 'instagram-scraper.p.rapidapi.com';
+function getRapidKey(){ return 'PASTE_YOUR_RAPIDAPI_KEY_HERE'; }
 var _gk1='AIzaSyAxWuWntz',_gk2='ZjSX9ZQ4N12fKIH1NvyDpzTG8';
-function getGemKey(){return _gk1+_gk2}
-// ─────────────────────────────────────────────
- 
+function getGemKey(){ return _gk1+_gk2; }
+// ─────────────────────────────────────────────────────────
+
+// ── State ─────────────────────────────────────────────────
 let charts = {};
 let accountContext = null;
 let chatHistory = [];
+let currentUser = null;
 let followersCount = 0;
- 
-function getRapidKey(){ return localStorage.getItem('instaiq_rapid_key') || '' }
- 
-// ── Utils ──
-function fmtNum(n){ n=parseInt(n)||0; if(n>=1e9)return(n/1e9).toFixed(1)+'B'; if(n>=1e6)return(n/1e6).toFixed(1)+'M'; if(n>=1e3)return(n/1e3).toFixed(1)+'K'; return n.toString() }
-function clamp(v,lo,hi){ return Math.max(lo,Math.min(hi,v)) }
-function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;') }
-function normalizeUsername(input){
-  input = input.trim();
-  var urlMatch = input.match(/instagram\.com\/([^\/\?\s]+)/);
-  if(urlMatch) return urlMatch[1].replace('@','');
-  return input.replace(/^@/,'').toLowerCase();
+
+// ── Niche definitions ─────────────────────────────────────
+const NICHES = {
+  'Fitness & Health':  {icon:'💪', tags:['Workout','Nutrition','Wellness','Mindset','Progress']},
+  'Fashion & Style':   {icon:'👗', tags:['OOTD','Lookbook','Style Tips','Trends','Brand Collab']},
+  'Food & Cooking':    {icon:'🍕', tags:['Recipes','Foodie','Restaurant','Chef','Cooking Tips']},
+  'Travel':            {icon:'✈️', tags:['Destinations','Wanderlust','Adventure','Hotels','Tips']},
+  'Business':          {icon:'💼', tags:['Entrepreneurship','Marketing','Strategy','Growth','Finance']},
+  'Art & Creative':    {icon:'🎨', tags:['Photography','Design','Illustration','Portfolio','Creative']},
+  'Entertainment':     {icon:'🎭', tags:['Memes','Comedy','Viral','Trending','Pop Culture']},
+  'Technology':        {icon:'💻', tags:['Tech News','Coding','AI','Gadgets','Innovation']},
+  'Lifestyle':         {icon:'🌟', tags:['Daily Life','Motivation','Selfcare','Routine','Positivity']},
+  'Education':         {icon:'📚', tags:['Tips & Tricks','How-to','Facts','Tutorials','Learning']},
+};
+const NICHE_KEYWORDS = {
+  'Fitness & Health':  ['fitness','gym','workout','health','training','muscle','yoga','nutrition','diet','exercise','wellness','gains','running','crossfit'],
+  'Fashion & Style':   ['fashion','style','ootd','outfit','clothes','beauty','makeup','skincare','luxury','brand','designer','looks','glam','aesthetic'],
+  'Food & Cooking':    ['food','recipe','cooking','eat','restaurant','chef','baking','delicious','foodie','meal','breakfast','lunch','dinner','taste','kitchen'],
+  'Travel':            ['travel','wanderlust','adventure','explore','vacation','trip','destination','hotel','beach','mountain','culture','world','journey'],
+  'Business':          ['business','entrepreneur','money','invest','startup','success','marketing','brand','income','finance','sales','hustle','leadership','ceo'],
+  'Art & Creative':    ['art','photography','design','creative','artist','photo','illustration','portfolio','gallery','studio','draw','paint','capture'],
+  'Entertainment':     ['funny','meme','entertainment','viral','comedy','humor','laugh','trending','challenge','celebrity','music','film','tv','pop'],
+  'Technology':        ['tech','technology','coding','programming','software','ai','developer','innovation','digital','computer','gadget','app','data'],
+  'Lifestyle':         ['lifestyle','life','motivation','inspiration','mindset','selfcare','positive','daily','routine','morning','journal','habits','peace'],
+  'Education':         ['learn','education','tips','howto','tutorial','knowledge','study','advice','guide','facts','science','history','reading','books'],
+};
+const NICHE_HASHTAGS = {
+  'Fitness & Health':  {large:['#fitness','#gym','#workout','#health'],medium:['#fitnessmotivation','#gymmotivation','#fitlife'],niche:['#fitnessjourney','#homeworkout','#strengthtraining']},
+  'Fashion & Style':   {large:['#fashion','#style','#ootd','#beauty'],medium:['#fashionblogger','#outfitoftheday','#styleblogger'],niche:['#sustainablefashion','#streetwear','#capsulewardrobe']},
+  'Food & Cooking':    {large:['#food','#foodie','#cooking','#recipe'],medium:['#foodblogger','#homecooking','#instafood'],niche:['#mealprep','#foodphotography','#plantbased']},
+  'Travel':            {large:['#travel','#adventure','#explore','#wanderlust'],medium:['#travelblogger','#travelgram','#travelphotography'],niche:['#solotravel','#budgettravel','#hiddengems']},
+  'Business':          {large:['#business','#entrepreneur','#success','#marketing'],medium:['#smallbusiness','#entrepreneurship','#businesstips'],niche:['#startuplife','#growthhacking','#digitalmarketing']},
+  'Art & Creative':    {large:['#art','#photography','#design','#creative'],medium:['#digitalart','#artofinstagram','#photographer'],niche:['#artprocess','#behindthelens','#creativecommunity']},
+  'Entertainment':     {large:['#funny','#meme','#entertainment','#viral'],medium:['#comedy','#humor','#trending'],niche:['#dailymemes','#relatable','#viralcontent']},
+  'Technology':        {large:['#tech','#technology','#ai','#coding'],medium:['#developer','#programming','#techlife'],niche:['#aitools','#techtips','#softwaredev']},
+  'Lifestyle':         {large:['#lifestyle','#motivation','#inspiration','#life'],medium:['#selfcare','#positivity','#morningroutine'],niche:['#mindfuliving','#slowliving','#dailyinspiration']},
+  'Education':         {large:['#education','#learn','#tips','#knowledge'],medium:['#studygram','#didyouknow','#learnontiktok'],niche:['#educationcontent','#studytips','#factsdaily']},
+};
+
+/* ══════════════════════════════════
+   UTILITIES
+══════════════════════════════════ */
+function fmtNum(n){ n=parseInt(n)||0; if(n>=1e9)return(n/1e9).toFixed(1)+'B'; if(n>=1e6)return(n/1e6).toFixed(1)+'M'; if(n>=1e3)return(n/1e3).toFixed(1)+'K'; return n.toString(); }
+function clamp(v,lo,hi){ return Math.max(lo,Math.min(hi,v)); }
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function normalizeUsername(raw){ var m=raw.trim().match(/instagram\.com\/([^\/\?\s@]+)/); if(m)return m[1]; return raw.trim().replace(/^@/,'').toLowerCase(); }
+function showToast(msg){ var t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(function(){t.classList.remove('show');},2200); }
+
+/* ══════════════════════════════════
+   SESSION / LOGIN
+══════════════════════════════════ */
+function checkSession(){
+  try{
+    var s=JSON.parse(localStorage.getItem('instaiq_session')||'null');
+    if(s&&s.username&&(Date.now()-s.loginTime)<7*24*60*60*1000){ currentUser=s.username; activateApp(s.username); return; }
+  }catch(e){}
+  document.getElementById('loginScreen').style.display='flex';
 }
- 
-/* ════════════════════════════════
+
+function doLogin(){
+  var raw=document.getElementById('loginInput').value.trim().replace(/^@/,'');
+  if(!raw){ document.getElementById('loginErr').textContent='Please enter your Instagram username.'; return; }
+  if(!/^[a-zA-Z0-9._]{1,30}$/.test(raw)){ document.getElementById('loginErr').textContent='Invalid username format.'; return; }
+  document.getElementById('loginErr').textContent='';
+  localStorage.setItem('instaiq_session',JSON.stringify({username:raw,loginTime:Date.now()}));
+  currentUser=raw;
+  activateApp(raw);
+}
+
+function demoLogin(username){ currentUser=username; localStorage.setItem('instaiq_session',JSON.stringify({username:username,loginTime:Date.now()})); activateApp(username); }
+function demoAnalyze(u){ document.getElementById('accountInput').value='@'+u; startAnalysis(); }
+
+function activateApp(username){
+  document.getElementById('loginScreen').style.display='none';
+  document.getElementById('mainNav').style.display='flex';
+  document.getElementById('hero').style.display='flex';
+  document.getElementById('navUserPill').classList.add('show');
+  document.getElementById('navUserAvatar').textContent=username.charAt(0).toUpperCase();
+  document.getElementById('navUserName').textContent='@'+username;
+  document.getElementById('heroGreeting').textContent='👋 Welcome back, @'+username+'!';
+  document.getElementById('accountInput').value='@'+username;
+}
+
+function doLogout(){
+  localStorage.removeItem('instaiq_session');
+  currentUser=null; accountContext=null; chatHistory=[];
+  Object.values(charts).forEach(function(c){c.destroy();}); charts={};
+  document.getElementById('dashboard').style.display='none';
+  document.getElementById('hero').style.display='none';
+  document.getElementById('mainNav').style.display='none';
+  document.getElementById('navUserPill').classList.remove('show');
+  document.getElementById('chatFab').classList.remove('visible');
+  document.getElementById('chatPanel').classList.remove('open');
+  document.getElementById('loginScreen').style.display='flex';
+  document.getElementById('loginInput').value='';
+}
+
+/* ══════════════════════════════════
    INSTAGRAM API (RapidAPI)
-   ════════════════════════════════ */
+══════════════════════════════════ */
 async function igFetch(endpoint, params){
-  var key = getRapidKey();
-  if(!key) throw new Error('API key required. Click "Setup API Key" in the top right to add your RapidAPI key.');
-  var url = new URL('https://'+RAPID_HOST+endpoint);
+  var url=new URL('https://'+RAPID_HOST+endpoint);
   Object.entries(params).forEach(function([k,v]){ url.searchParams.set(k,v); });
-  var res = await fetch(url.toString(), {
+  var res=await fetch(url.toString(),{
     method:'GET',
-    headers:{'x-rapidapi-key':key,'x-rapidapi-host':RAPID_HOST}
+    headers:{'x-rapidapi-key':getRapidKey(),'x-rapidapi-host':RAPID_HOST}
   });
   if(!res.ok){
-    var err = await res.json().catch(function(){return{};});
-    var msg = err.message || err.detail || ('HTTP '+res.status);
-    if(res.status===401||res.status===403) throw new Error('Invalid API key. Please check your RapidAPI key in Setup.');
+    var body=await res.json().catch(function(){return{};});
+    var msg=body.message||body.detail||('HTTP '+res.status);
+    if(res.status===401||res.status===403) throw new Error('Invalid RapidAPI key. Please update your key in the config.');
     if(res.status===429) throw new Error('Rate limit reached. Please wait a moment and try again.');
-    if(res.status===404) throw new Error('Instagram account "'+params.username_or_id_or_url+'" not found or is private.');
-    throw new Error('API Error: '+msg);
+    if(res.status===404) throw new Error('Account "'+params.username+'" not found or is private.');
+    throw new Error('API error: '+msg);
   }
   return res.json();
 }
- 
+
 async function fetchProfile(username){
-  var data = await igFetch('/v1/info', {username_or_id_or_url: username});
-  var u = data.data || data.user || data;
-  if(!u || !u.username) throw new Error('Could not parse profile data. Account may be private.');
+  var data=await igFetch('/user',{username:username});
+  // Handle multiple response shapes from instagram-scraper API
+  var u=data.user||data.data||data;
+  if(!u||!(u.username||u.pk)) throw new Error('Could not parse profile. Account may be private or API response changed.');
   return {
-    username: u.username || username,
-    fullName: u.full_name || u.fullName || '',
-    bio: u.biography || u.bio || '',
-    avatarUrl: u.profile_pic_url_hd || u.profile_pic_url || u.hd_profile_pic_url_info?.url || '',
+    username: u.username||username,
+    fullName: u.full_name||u.fullName||'',
+    bio: u.biography||u.bio||'',
+    avatarUrl: u.profile_pic_url_hd||u.profile_pic_url||u.hd_profile_pic_url_info?.url||'',
     followers: parseInt(u.follower_count||u.followers||u.edge_followed_by?.count||0),
     following: parseInt(u.following_count||u.following||u.edge_follow?.count||0),
     mediaCount: parseInt(u.media_count||u.posts||0),
     isVerified: !!(u.is_verified||u.verified),
     isBusiness: !!(u.is_business_account||u.is_professional_account||u.is_creator_account),
     category: u.category_name||u.category||u.business_category_name||'',
-    externalUrl: u.external_url||u.bio_links?.[0]?.url||'',
     isPrivate: !!(u.is_private),
   };
 }
- 
+
 async function fetchPosts(username){
-  var data = await igFetch('/v1/posts', {username_or_id_or_url: username, count:50});
-  var items = data.data?.items || data.items || data.data?.edges?.map(function(e){return e.node}) || [];
+  var data=await igFetch('/posts',{username_or_id:username});
+  // Handle multiple response shapes
+  var items=data.collector||data.data?.collector||data.items||data.data?.items||
+            (data.data?.edges||[]).map(function(e){return e.node;})||[];
   return items.map(function(item){
-    var mt = item.media_type;
-    var pt = item.product_type||'';
-    var mediaType = mt===8||mt==='CAROUSEL_ALBUM' ? 'carousel'
-                  : (mt===2||pt==='clips'||pt==='reels') ? 'reel'
-                  : 'photo';
-    var captionText = item.caption?.text||item.edge_media_to_caption?.edges?.[0]?.node?.text||item.accessibility_caption||'';
-    var hashtags = (captionText.match(/#\w+/g)||[]).map(function(h){return h.toLowerCase()});
-    var mentions = (captionText.match(/@\w+/g)||[]).length;
-    var emojis = !!(captionText.match(/[\u{1F000}-\u{1FFFF}]|[\u{2600}-\u{27BF}]/u));
-    var ts = item.taken_at ? new Date(item.taken_at*1000) : new Date(item.timestamp||0);
+    var type=item.type||'';
+    var isCarousel=type==='GraphSidecar'||item.media_type===8||type==='carousel';
+    var isVideo=!!(item.isVideo||item.is_video||item.media_type===2);
+    var isReel=!!(item.product_type==='clips'||item.is_reel||item.type==='reel'||
+                  (isVideo&&(item.videoViewCount||item.view_count||0)>0&&!isCarousel));
+    var mediaType=isCarousel?'carousel':isReel?'reel':isVideo?'video':'photo';
+    var captionText=item.caption||item.edge_media_to_caption?.edges?.[0]?.node?.text||'';
+    var hashtags=Array.isArray(item.hashtags)?item.hashtags.map(function(h){return h.replace(/^#/,'').toLowerCase();})
+                 :(captionText.match(/#\w+/g)||[]).map(function(h){return h.replace('#','').toLowerCase();});
+    var ts=item.timestamp?new Date(item.timestamp*1000):item.taken_at?new Date(item.taken_at*1000):new Date();
     return {
-      id: item.id||item.shortcode||'',
-      shortcode: item.shortcode||item.code||'',
-      mediaType: mediaType,
-      likes: parseInt(item.like_count||item.edge_liked_by?.count||item.edge_media_preview_like?.count||0),
-      comments: parseInt(item.comment_count||item.edge_media_to_comment?.count||0),
-      views: parseInt(item.view_count||item.play_count||item.video_view_count||0),
-      caption: captionText,
-      hashtags: hashtags,
-      mentions: mentions,
-      hasEmoji: emojis,
-      timestamp: ts,
-      hour: ts.getHours(),
-      dayOfWeek: ts.getDay(), // 0=Sun
+      id:item.id||item.shortCode||'',
+      mediaType:mediaType,
+      likes:parseInt(item.likesCount||item.like_count||item.edge_liked_by?.count||0),
+      comments:parseInt(item.commentsCount||item.comment_count||item.edge_media_to_comment?.count||0),
+      views:parseInt(item.videoViewCount||item.view_count||item.play_count||0),
+      caption:captionText,
+      hashtags:hashtags,
+      mentions:(captionText.match(/@\w+/g)||[]).length,
+      hasEmoji:!!(captionText.match(/[\u{1F000}-\u{1FFFF}]|[\u{2600}-\u{27BF}]/u)),
+      timestamp:ts,
+      hour:ts.getHours(),
+      dayOfWeek:ts.getDay(),
     };
   });
 }
- 
-/* ════════════════════════════════
+
+/* ══════════════════════════════════
    ANALYTICS ENGINE
-   ════════════════════════════════ */
-const NICHES = {
-  'Fitness & Health': {icon:'💪', tags:['Workout','Nutrition','Wellness','Mindset','Progress']},
-  'Fashion & Style':  {icon:'👗', tags:['OOTD','Lookbook','Style Tips','Trends','Brand Collab']},
-  'Food & Cooking':   {icon:'🍕', tags:['Recipes','Foodie','Restaurant','Chef','Cooking Tips']},
-  'Travel':           {icon:'✈️', tags:['Destinations','Wanderlust','Adventure','Hotels','Tips']},
-  'Business':         {icon:'💼', tags:['Entrepreneurship','Marketing','Strategy','Growth','Finance']},
-  'Art & Creative':   {icon:'🎨', tags:['Photography','Design','Illustration','Portfolio','Creative']},
-  'Entertainment':    {icon:'🎭', tags:['Memes','Comedy','Viral','Trending','Pop Culture']},
-  'Technology':       {icon:'💻', tags:['Tech News','Coding','AI','Gadgets','Innovation']},
-  'Lifestyle':        {icon:'🌟', tags:['Daily Life','Motivation','Selfcare','Routine','Positivity']},
-  'Education':        {icon:'📚', tags:['Tips & Tricks','How-to','Facts','Tutorials','Learning']},
-};
-const NICHE_KEYWORDS = {
-  'Fitness & Health': ['fitness','gym','workout','health','training','muscle','yoga','nutrition','diet','exercise','wellness','gains','running','crossfit','hiit'],
-  'Fashion & Style':  ['fashion','style','ootd','outfit','clothes','beauty','makeup','skincare','luxury','brand','designer','looks','glam','aesthetic'],
-  'Food & Cooking':   ['food','recipe','cooking','eat','restaurant','chef','baking','delicious','foodie','meal','breakfast','lunch','dinner','taste','kitchen'],
-  'Travel':           ['travel','wanderlust','adventure','explore','vacation','trip','destination','hotel','beach','mountain','culture','world','journey','abroad'],
-  'Business':         ['business','entrepreneur','money','invest','startup','success','marketing','brand','income','finance','sales','hustle','leadership','ceo'],
-  'Art & Creative':   ['art','photography','design','creative','artist','photo','illustration','portfolio','gallery','studio','draw','paint','capture'],
-  'Entertainment':    ['funny','meme','entertainment','viral','comedy','humor','laugh','trending','challenge','celebrity','music','film','tv','pop'],
-  'Technology':       ['tech','technology','coding','programming','software','ai','developer','innovation','digital','computer','gadget','app','startup','data'],
-  'Lifestyle':        ['lifestyle','life','motivation','inspiration','mindset','selfcare','positive','daily','routine','morning','journal','habits','peace','glow'],
-  'Education':        ['learn','education','tips','howto','tutorial','knowledge','study','advice','guide','facts','science','history','reading','books'],
-};
- 
-function detectNiche(profile, posts){
-  var scores = {};
-  Object.keys(NICHE_KEYWORDS).forEach(function(n){ scores[n] = 0; });
-  var bioLower = (profile.bio||'').toLowerCase();
-  var catLower = (profile.category||'').toLowerCase();
+══════════════════════════════════ */
+function detectNiche(profile,posts){
+  var scores={};
+  Object.keys(NICHE_KEYWORDS).forEach(function(n){ scores[n]=0; });
+  var bioLower=(profile.bio||'').toLowerCase();
+  var catLower=(profile.category||'').toLowerCase();
   Object.entries(NICHE_KEYWORDS).forEach(function([n,kws]){
-    kws.forEach(function(kw){
-      if(bioLower.includes(kw)) scores[n] += 3;
-      if(catLower.includes(kw)) scores[n] += 4;
-    });
+    kws.forEach(function(kw){ if(bioLower.includes(kw))scores[n]+=3; if(catLower.includes(kw))scores[n]+=4; });
   });
   posts.slice(0,30).forEach(function(p){
-    var text = p.caption.toLowerCase();
-    var htags = p.hashtags.join(' ');
+    var text=(p.caption||'').toLowerCase();
+    var htags=p.hashtags.join(' ');
     Object.entries(NICHE_KEYWORDS).forEach(function([n,kws]){
-      kws.forEach(function(kw){ if(text.includes(kw)||htags.includes(kw)) scores[n]++; });
+      kws.forEach(function(kw){ if(text.includes(kw)||htags.includes(kw))scores[n]++; });
     });
   });
-  var sorted = Object.entries(scores).sort(function(a,b){return b[1]-a[1];});
-  var top = sorted[0];
-  var total = sorted.reduce(function(s,e){return s+e[1];},0)||1;
-  var conf = clamp(Math.round((top[1]/total)*100*1.8),48,97);
-  return {niche: top[0]||'Lifestyle', confidence: conf};
+  var sorted=Object.entries(scores).sort(function(a,b){return b[1]-a[1];});
+  var top=sorted[0]||['Lifestyle',0];
+  var total=sorted.reduce(function(s,e){return s+e[1];},0)||1;
+  return {niche:top[0],confidence:clamp(Math.round((top[1]/total)*100*1.8),48,97)};
 }
- 
-function calcEngagementRate(posts, followers){
-  if(!followers||!posts.length) return 0;
-  var er = posts.map(function(p){ return ((p.likes+p.comments)/followers)*100; });
-  return (er.reduce(function(s,v){return s+v;},0)/er.length).toFixed(2);
+
+function calcEngagementRate(posts,followers){
+  if(!followers||!posts.length)return '0.00';
+  var total=posts.reduce(function(s,p){return s+(p.likes+p.comments);},0);
+  return ((total/posts.length)/followers*100).toFixed(2);
 }
- 
 function calcAvgLikes(posts){ return posts.length?Math.round(posts.reduce(function(s,p){return s+p.likes;},0)/posts.length):0; }
 function calcAvgComments(posts){ return posts.length?Math.round(posts.reduce(function(s,p){return s+p.comments;},0)/posts.length):0; }
- 
+
 function calcPostFreq(posts){
-  if(posts.length<2) return '—';
-  var sorted = posts.map(function(p){return p.timestamp;}).sort(function(a,b){return b-a;});
-  var gaps = [];
+  if(posts.length<2)return '—';
+  var sorted=posts.map(function(p){return p.timestamp;}).sort(function(a,b){return b-a;});
+  var gaps=[];
   for(var i=0;i<Math.min(sorted.length-1,20);i++) gaps.push((sorted[i]-sorted[i+1])/86400000);
-  var avg = gaps.reduce(function(s,g){return s+g;},0)/gaps.length;
-  if(avg<=1) return '1+/day';
-  if(avg<=3.5) return Math.round(7/avg)+'/week';
-  if(avg<=14) return Math.round(30/avg)+'/month';
-  return 'Every '+Math.round(avg)+'d';
+  var avg=gaps.reduce(function(s,g){return s+g;},0)/gaps.length;
+  if(avg<=1)return '1+/day'; if(avg<=3.5)return Math.round(7/avg)+'/week';
+  if(avg<=14)return Math.round(30/avg)+'/month'; return 'Every '+Math.round(avg)+'d';
 }
- 
+
 function buildContentMix(posts){
-  var m = {Photos:0,Reels:0,Carousels:0};
-  posts.forEach(function(p){
-    if(p.mediaType==='reel') m.Reels++;
-    else if(p.mediaType==='carousel') m.Carousels++;
-    else m.Photos++;
-  });
+  var m={Photos:0,Reels:0,Carousels:0};
+  posts.forEach(function(p){ if(p.mediaType==='reel')m.Reels++; else if(p.mediaType==='carousel')m.Carousels++; else m.Photos++; });
   return m;
 }
- 
+
 function buildMonthlyData(posts){
   var M=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-  var now = new Date(), bk = {};
+  var now=new Date(),bk={};
   for(var i=11;i>=0;i--){var d=new Date(now.getFullYear(),now.getMonth()-i,1);bk[d.getFullYear()+'-'+d.getMonth()]={likes:0,comments:0,count:0};}
   posts.forEach(function(p){
-    var k = p.timestamp.getFullYear()+'-'+p.timestamp.getMonth();
+    var k=p.timestamp.getFullYear()+'-'+p.timestamp.getMonth();
     if(bk[k]){bk[k].likes+=p.likes;bk[k].comments+=p.comments;bk[k].count++;}
   });
-  var keys = Object.keys(bk);
-  return {
-    labels: keys.map(function(k){return M[parseInt(k.split('-')[1])]}),
-    likesData: keys.map(function(k){return bk[k].count?Math.round(bk[k].likes/bk[k].count):0}),
-    commentsData: keys.map(function(k){return bk[k].count?Math.round(bk[k].comments/bk[k].count):0}),
+  var keys=Object.keys(bk);
+  return{
+    labels:keys.map(function(k){return M[parseInt(k.split('-')[1])];}),
+    likesData:keys.map(function(k){return bk[k].count?Math.round(bk[k].likes/bk[k].count):0;}),
+    commentsData:keys.map(function(k){return bk[k].count?Math.round(bk[k].comments/bk[k].count):0;}),
   };
 }
- 
+
 function buildHashtagFreq(posts){
-  var freq = {};
-  posts.forEach(function(p){
-    p.hashtags.forEach(function(h){
-      if(h.length>2) freq[h] = (freq[h]||0)+1;
-    });
-  });
+  var freq={};
+  posts.forEach(function(p){ p.hashtags.forEach(function(h){ if(h.length>2)freq[h]=(freq[h]||0)+1; }); });
   return Object.entries(freq).sort(function(a,b){return b[1]-a[1];}).slice(0,40);
 }
- 
+
 function buildBestTimes(posts){
-  var DAYS = ['SUN','MON','TUE','WED','THU','FRI','SAT'];
-  // heatmap: [day][hour_slot] = avg engagement
-  var slots = 6; // 6 2-hour slots from 6am to 11pm
-  var grid = Array.from({length:7},function(){return Array(slots).fill(0);});
-  var counts = Array.from({length:7},function(){return Array(slots).fill(0);});
+  var grid=Array.from({length:7},function(){return Array(6).fill(0);});
+  var counts=Array.from({length:7},function(){return Array(6).fill(0);});
   posts.forEach(function(p){
-    var h = p.hour;
-    // Map hour 6-21 to slots (6-7=0, 8-9=1, 10-11=2, 12-13=3, 14-17=4, 18-21=5)
-    var slot = h<6?-1:h<8?0:h<10?1:h<12?2:h<15?3:h<18?4:h<22?5:-1;
-    if(slot>=0){
-      grid[p.dayOfWeek][slot] += p.likes+p.comments;
-      counts[p.dayOfWeek][slot]++;
-    }
+    var h=p.hour;
+    var slot=h<6?-1:h<8?0:h<10?1:h<12?2:h<15?3:h<18?4:h<22?5:-1;
+    if(slot>=0){grid[p.dayOfWeek][slot]+=p.likes+p.comments;counts[p.dayOfWeek][slot]++;}
   });
-  // Normalize
-  var max = 0;
+  var max=0;
   grid.forEach(function(row,d){ row.forEach(function(v,s){ var avg=counts[d][s]?v/counts[d][s]:0; grid[d][s]=avg; if(avg>max)max=avg; }); });
   if(max>0) grid.forEach(function(row,d){ row.forEach(function(v,s){ grid[d][s]=max>0?v/max:0; }); });
-  return {grid, days:DAYS};
+  return {grid:grid};
 }
- 
-function buildRadarScores(posts, profile){
-  var avgEng = parseFloat(calcEngagementRate(posts, profile.followers))||0;
-  var engScore = clamp(Math.round((avgEng/5)*100),5,100);
-  // Consistency
-  var sorted = posts.map(function(p){return p.timestamp;}).sort(function(a,b){return b-a;});
-  var gaps = [];
+
+function buildRadarScores(posts,profile){
+  var er=parseFloat(calcEngagementRate(posts,profile.followers))||0;
+  var engScore=clamp(Math.round((er/5)*100),5,100);
+  var sorted=posts.map(function(p){return p.timestamp;}).sort(function(a,b){return b-a;});
+  var gaps=[];
   for(var i=0;i<Math.min(sorted.length-1,15);i++) gaps.push((sorted[i]-sorted[i+1])/86400000);
-  var ag = gaps.reduce(function(s,g){return s+g;},0)/(gaps.length||1);
-  var std = Math.sqrt(gaps.reduce(function(s,g){return s+Math.pow(g-ag,2);},0)/(gaps.length||1));
-  var conScore = clamp(Math.round(100-(ag>0?std/ag:1)*50),10,100);
-  // Hashtag strategy
-  var avgHt = posts.reduce(function(s,p){return s+p.hashtags.length;},0)/(posts.length||1);
-  var htScore = clamp(Math.round((avgHt/20)*100),0,100);
-  // Caption quality
-  var avgCap = posts.reduce(function(s,p){return s+p.caption.length;},0)/(posts.length||1);
-  var emojiPct = posts.filter(function(p){return p.hasEmoji;}).length/(posts.length||1);
-  var capScore = clamp(Math.round(((avgCap/300)*60)+(emojiPct*40)),10,100);
-  // Content mix variety
-  var mix = buildContentMix(posts);
-  var total = Object.values(mix).reduce(function(s,v){return s+v;},0)||1;
-  var variety = Object.values(mix).filter(function(v){return v/total>0.1;}).length;
-  var mixScore = clamp(Math.round((variety/3)*100),20,100);
-  // Growth potential: follower/following ratio
-  var ratio = profile.following>0?profile.followers/profile.following:profile.followers/100;
-  var growScore = clamp(Math.round((Math.log10(ratio+1)/3)*100),10,100);
-  return [engScore, conScore, htScore, capScore, mixScore, growScore];
+  var ag=gaps.reduce(function(s,g){return s+g;},0)/(gaps.length||1);
+  var std=Math.sqrt(gaps.reduce(function(s,g){return s+Math.pow(g-ag,2);},0)/(gaps.length||1));
+  var conScore=clamp(Math.round(100-(ag>0?std/ag:1)*50),10,100);
+  var avgHt=posts.reduce(function(s,p){return s+p.hashtags.length;},0)/(posts.length||1);
+  var htScore=clamp(Math.round((avgHt/20)*100),0,100);
+  var avgCap=posts.reduce(function(s,p){return s+p.caption.length;},0)/(posts.length||1);
+  var emojiPct=posts.filter(function(p){return p.hasEmoji;}).length/(posts.length||1);
+  var capScore=clamp(Math.round(((avgCap/300)*60)+(emojiPct*40)),10,100);
+  var mix=buildContentMix(posts);
+  var total=Object.values(mix).reduce(function(s,v){return s+v;},0)||1;
+  var variety=Object.values(mix).filter(function(v){return v/total>0.1;}).length;
+  var mixScore=clamp(Math.round((variety/3)*100),20,100);
+  var ratio=profile.following>0?profile.followers/profile.following:50;
+  var growScore=clamp(Math.round((Math.log10(ratio+1)/3)*100),10,100);
+  return [engScore,conScore,htScore,capScore,mixScore,growScore];
 }
- 
-function mineAprioriRules(posts, followers){
-  var avgEng = parseFloat(calcEngagementRate(posts, followers))||0.01;
-  var props = [
-    {l:'emoji_in_caption',   f:function(p){return p.hasEmoji}},
-    {l:'hashtags_20+',       f:function(p){return p.hashtags.length>=20}},
-    {l:'hashtags_10-19',     f:function(p){return p.hashtags.length>=10&&p.hashtags.length<20}},
-    {l:'carousel_format',    f:function(p){return p.mediaType==='carousel'}},
-    {l:'reel_format',        f:function(p){return p.mediaType==='reel'}},
-    {l:'short_caption<80',   f:function(p){return p.caption.length>0&&p.caption.length<80}},
-    {l:'long_caption_300+',  f:function(p){return p.caption.length>=300}},
-    {l:'has_@mention',       f:function(p){return p.mentions>0}},
-    {l:'weekend_post',       f:function(p){return p.dayOfWeek===0||p.dayOfWeek===6}},
-    {l:'evening_6-9pm',      f:function(p){return p.hour>=18&&p.hour<21}},
-    {l:'morning_8-11am',     f:function(p){return p.hour>=8&&p.hour<11}},
+
+function mineAprioriRules(posts,followers){
+  var avgEng=parseFloat(calcEngagementRate(posts,followers))||0.01;
+  var props=[
+    {l:'emoji_in_caption',   f:function(p){return p.hasEmoji;}},
+    {l:'hashtags_20+',       f:function(p){return p.hashtags.length>=20;}},
+    {l:'hashtags_10-19',     f:function(p){return p.hashtags.length>=10&&p.hashtags.length<20;}},
+    {l:'carousel_format',    f:function(p){return p.mediaType==='carousel';}},
+    {l:'reel_format',        f:function(p){return p.mediaType==='reel';}},
+    {l:'short_caption<80',   f:function(p){return p.caption.length>0&&p.caption.length<80;}},
+    {l:'long_caption_300+',  f:function(p){return p.caption.length>=300;}},
+    {l:'has_@mention',       f:function(p){return p.mentions>0;}},
+    {l:'weekend_post',       f:function(p){return p.dayOfWeek===0||p.dayOfWeek===6;}},
+    {l:'evening_6-9pm',      f:function(p){return p.hour>=18&&p.hour<21;}},
+    {l:'morning_8-11am',     f:function(p){return p.hour>=8&&p.hour<11;}},
   ];
-  var rules = [];
-  outer: for(var i=0;i<props.length;i++) for(var j=i+1;j<props.length;j++){
-    var group = posts.filter(function(p){return props[i].f(p)&&props[j].f(p);});
-    if(group.length<2) continue;
-    var ge = group.reduce(function(s,p){return s+((p.likes+p.comments)/(followers||1))*100;},0)/group.length;
-    var lift = clamp(parseFloat((ge/avgEng).toFixed(1)),0.8,5.0);
-    var conf = parseFloat(clamp(0.72+(ge/avgEng)*0.1,0.73,0.98).toFixed(2));
-    var con = ge>avgEng*1.8?'viral_potential':ge>avgEng*1.3?'high_engagement':ge>avgEng?'above_avg_eng':'avg_engagement';
+  var rules=[];
+  outer:for(var i=0;i<props.length;i++) for(var j=i+1;j<props.length;j++){
+    var group=posts.filter(function(p){return props[i].f(p)&&props[j].f(p);});
+    if(group.length<2)continue;
+    var ge=group.reduce(function(s,p){return s+((p.likes+p.comments)/(followers||1))*100;},0)/group.length;
+    var lift=clamp(parseFloat((ge/avgEng).toFixed(1)),0.8,5.0);
+    var conf=parseFloat(clamp(0.72+(ge/avgEng)*0.1,0.73,0.98).toFixed(2));
+    var con=ge>avgEng*1.8?'viral_potential':ge>avgEng*1.3?'high_engagement':ge>avgEng?'above_avg_eng':'avg_engagement';
     rules.push({ant:props[i].l+' + '+props[j].l,con:con,conf:conf,lift:lift});
-    if(rules.length>=6) break outer;
+    if(rules.length>=6)break outer;
   }
   var fb=[
     {ant:'emoji_in_caption + hashtags_20+',con:'viral_potential',conf:.93,lift:2.8},
@@ -873,70 +1091,76 @@ function mineAprioriRules(posts, followers){
     {ant:'hashtags_20+ + weekend_post',con:'discover_growth',conf:.86,lift:1.9},
     {ant:'long_caption_300+ + has_@mention',con:'community_boost',conf:.85,lift:2.3},
   ];
-  while(rules.length<6) rules.push(fb[rules.length]);
+  while(rules.length<6)rules.push(fb[rules.length]);
   return rules.slice(0,6);
 }
- 
-/* ════════════════════════════════
+
+/* ══════════════════════════════════
    MAIN DATA BUILDER
-   ════════════════════════════════ */
+══════════════════════════════════ */
 async function buildAccountData(username){
-  var [profile, posts] = await Promise.all([fetchProfile(username), fetchPosts(username)]);
-  if(profile.isPrivate && posts.length===0) throw new Error('This account is private. Only public accounts can be analyzed.');
-  followersCount = profile.followers;
-  var nicheData = detectNiche(profile, posts);
+  var [profile,posts]=await Promise.all([fetchProfile(username),fetchPosts(username).catch(function(){return[];})]);
+  if(profile.isPrivate&&posts.length===0) throw new Error('This account is private. Only public accounts can be analyzed.');
+  followersCount=profile.followers;
+  var nicheData=detectNiche(profile,posts);
   return {
-    profile,
-    posts,
-    niche: nicheData.niche,
-    confidence: nicheData.confidence,
-    engRate: calcEngagementRate(posts, profile.followers),
-    avgLikes: calcAvgLikes(posts),
-    avgComments: calcAvgComments(posts),
-    postFreq: calcPostFreq(posts),
-    contentMix: buildContentMix(posts),
-    monthlyData: buildMonthlyData(posts),
-    hashtagFreq: buildHashtagFreq(posts),
-    bestTimes: buildBestTimes(posts),
-    radarScores: buildRadarScores(posts, profile),
-    aprioriRules: mineAprioriRules(posts, profile.followers),
+    profile:profile,posts:posts,
+    niche:nicheData.niche,confidence:nicheData.confidence,
+    engRate:calcEngagementRate(posts,profile.followers),
+    avgLikes:calcAvgLikes(posts),avgComments:calcAvgComments(posts),
+    postFreq:calcPostFreq(posts),
+    contentMix:buildContentMix(posts),
+    monthlyData:buildMonthlyData(posts),
+    hashtagFreq:buildHashtagFreq(posts),
+    bestTimes:buildBestTimes(posts),
+    radarScores:buildRadarScores(posts,profile),
+    aprioriRules:mineAprioriRules(posts,profile.followers),
+    isNewAccount:profile.followers<1000||posts.length<10,
   };
 }
- 
-/* ════════════════════════════════
+
+/* ══════════════════════════════════
    UI FLOW
-   ════════════════════════════════ */
-function demoLoad(u){ document.getElementById('accountInput').value='@'+u; startAnalysis(); }
- 
+══════════════════════════════════ */
 async function startAnalysis(){
-  var raw = document.getElementById('accountInput').value.trim();
+  var raw=document.getElementById('accountInput').value.trim();
   if(!raw){ document.getElementById('accountInput').focus(); return; }
-  if(!getRapidKey()){ openApiModal(); return; }
-  var username = normalizeUsername(raw);
+  var username=normalizeUsername(raw);
   showLoading();
   try{
-    var p1 = buildAccountData(username);
-    var p2 = new Promise(function(res){runLoadingSteps(res);});
-    var [data] = await Promise.all([p1, p2]);
-    accountContext = data; chatHistory = [];
+    var [data]=await Promise.all([buildAccountData(username),new Promise(function(r){runLoadingSteps(r);})]);
+    accountContext=data; chatHistory=[];
     hideLoading();
     renderDashboard(data);
-  } catch(err){
+    // Generate AI strategy in background (non-blocking)
+    generateAndRenderGrowthStrategy(data);
+  }catch(err){
     hideLoading();
     document.getElementById('hero').style.display='flex';
-    alert('⚠️ '+err.message);
+    renderErrorBanner(err.message);
   }
 }
- 
+
+function renderErrorBanner(msg){
+  var existing=document.getElementById('errBanner');
+  if(existing)existing.remove();
+  var div=document.createElement('div');
+  div.id='errBanner';
+  div.style.cssText='position:fixed;top:80px;left:50%;transform:translateX(-50%);z-index:300;background:rgba(225,48,108,0.15);border:1px solid rgba(225,48,108,0.4);color:var(--pink);font-family:DM Mono,monospace;font-size:13px;padding:12px 24px;border-radius:12px;max-width:90vw;text-align:center;backdrop-filter:blur(10px)';
+  div.textContent='⚠️ '+msg;
+  document.body.appendChild(div);
+  setTimeout(function(){div.remove();},5000);
+}
+
 function runLoadingSteps(cb){
-  var ids=['s1','s2','s3','s4','s5'], delays=[0,600,1300,2100,2800];
+  var ids=['s1','s2','s3','s4','s5'],delays=[0,650,1350,2100,2800];
   ids.forEach(function(id,i){
     setTimeout(function(){
-      if(i>0) document.getElementById(ids[i-1]).className='step-item done';
+      if(i>0)document.getElementById(ids[i-1]).className='step-item done';
       document.getElementById(id).className='step-item active';
-    }, delays[i]);
+    },delays[i]);
   });
-  setTimeout(function(){document.getElementById('s5').className='step-item done';cb();}, 3400);
+  setTimeout(function(){document.getElementById('s5').className='step-item done';cb();},3500);
 }
 function showLoading(){
   document.getElementById('hero').style.display='none';
@@ -950,316 +1174,539 @@ function goBack(){
   accountContext=null; chatHistory=[];
   document.getElementById('dashboard').style.display='none';
   document.getElementById('hero').style.display='flex';
-  document.getElementById('accountInput').value='';
+  document.getElementById('accountInput').value=currentUser?'@'+currentUser:'';
   document.getElementById('chatFab').classList.remove('visible');
   document.getElementById('chatPanel').classList.remove('open');
+  if(currentUser){document.getElementById('heroGreeting').textContent='👋 Welcome back, @'+currentUser+'!';}
 }
- 
-/* ════════════════════════════════
+
+/* ══════════════════════════════════
    RENDER DASHBOARD
-   ════════════════════════════════ */
+══════════════════════════════════ */
 function renderDashboard(data){
   document.getElementById('dashboard').style.display='block';
   window.scrollTo(0,0);
-  var p = data.profile;
- 
+  var p=data.profile;
+
   // Avatar
-  var av = document.getElementById('avatarEl');
-  av.innerHTML = '';
+  var av=document.getElementById('avatarEl'); av.innerHTML='';
   if(p.avatarUrl){
-    var img = document.createElement('img');
+    var img=document.createElement('img');
     img.className='avatar-img'; img.src=p.avatarUrl; img.alt=p.fullName;
-    img.onerror = function(){av.textContent=(p.fullName||p.username||'?').charAt(0).toUpperCase();};
+    img.onerror=function(){av.textContent=(p.fullName||p.username||'?').charAt(0).toUpperCase();};
     av.appendChild(img);
   } else {
-    av.textContent = (p.fullName||p.username||'?').charAt(0).toUpperCase();
+    av.textContent=(p.fullName||p.username||'?').charAt(0).toUpperCase();
   }
- 
-  // Verified
   document.getElementById('verifiedBadge').className='profile-verified'+(p.isVerified?' show':'');
- 
-  // Profile info
-  document.getElementById('profileName').textContent = p.fullName || p.username;
-  document.getElementById('profileHandle').textContent = '@'+p.username + (p.category?' · '+p.category:'');
-  document.getElementById('profileBio').textContent = p.bio || '';
- 
-  // Badges
-  var badges = [];
-  if(p.isVerified) badges.push('<span class="badge-pill badge-verified">✓ VERIFIED</span>');
-  if(p.isBusiness) badges.push('<span class="badge-pill badge-business">BUSINESS</span>');
-  if(data.niche) badges.push('<span class="badge-pill badge-niche">'+data.niche.toUpperCase()+'</span>');
-  document.getElementById('profileBadges').innerHTML = badges.join('');
- 
+  document.getElementById('profileName').textContent=p.fullName||p.username;
+  document.getElementById('profileHandle').textContent='@'+p.username+(p.category?' · '+p.category:'');
+  document.getElementById('profileBio').textContent=p.bio||'';
+
+  var badges=[];
+  if(p.isVerified)badges.push('<span class="badge-pill badge-verified">✓ VERIFIED</span>');
+  if(p.isBusiness)badges.push('<span class="badge-pill badge-business">BUSINESS</span>');
+  if(data.isNewAccount)badges.push('<span class="badge-pill badge-new">NEW ACCOUNT</span>');
+  else badges.push('<span class="badge-pill badge-niche">'+data.niche.toUpperCase()+'</span>');
+  document.getElementById('profileBadges').innerHTML=badges.join('');
+
   // KPIs
-  var er = parseFloat(data.engRate);
-  var erTag = er>=5?'<span class="kpi-tag good">ABOVE BENCHMARK</span>':er>=2?'<span class="kpi-tag warn">AVERAGE</span>':'<span class="kpi-tag bad">BELOW BENCHMARK</span>';
-  var kpiData = [
-    {label:'FOLLOWERS',value:fmtNum(p.followers),sub:'@'+p.username,accent:'var(--ig)'},
+  var er=parseFloat(data.engRate);
+  var erTag=er>=5?'<span class="kpi-tag good">ABOVE BENCHMARK</span>':er>=2?'<span class="kpi-tag warn">AVERAGE</span>':'<span class="kpi-tag bad">BELOW 3% BENCHMARK</span>';
+  document.getElementById('kpiGrid').innerHTML=[
+    {label:'FOLLOWERS',value:fmtNum(p.followers),sub:'Real-time from Instagram',accent:'var(--ig)'},
     {label:'ENGAGEMENT RATE',value:data.engRate+'%',html:erTag,accent:'linear-gradient(45deg,#E1306C,#F77737)'},
     {label:'AVG LIKES/POST',value:fmtNum(data.avgLikes),sub:'Last '+Math.min(50,data.posts.length)+' posts',accent:'linear-gradient(45deg,#833AB4,#E1306C)'},
-    {label:'AVG COMMENTS',value:fmtNum(data.avgComments),sub:'Audience interaction',accent:'linear-gradient(45deg,#F77737,#FCAF45)'},
-    {label:'POSTING FREQUENCY',value:data.postFreq,sub:'Calculated from upload dates',accent:'linear-gradient(45deg,#833AB4,#9B5DE5)'},
-  ];
-  document.getElementById('kpiGrid').innerHTML = kpiData.map(function(k,i){
+    {label:'AVG COMMENTS',value:fmtNum(data.avgComments),sub:'Audience interaction index',accent:'linear-gradient(45deg,#F77737,#FCAF45)'},
+    {label:'POSTING FREQUENCY',value:data.postFreq,sub:'Calculated from upload history',accent:'linear-gradient(45deg,#833AB4,#9B5DE5)'},
+  ].map(function(k,i){
     return '<div class="kpi-card" style="--kpi-accent:'+k.accent+';animation-delay:'+(i*0.07)+'s">'
-      +'<div class="kpi-label">'+k.label+'</div>'
-      +'<div class="kpi-value">'+k.value+'</div>'
+      +'<div class="kpi-label">'+k.label+'</div><div class="kpi-value">'+k.value+'</div>'
       +(k.html||'<div class="kpi-sub">'+k.sub+'</div>')+'</div>';
   }).join('');
- 
+
   // Niche
-  var n = NICHES[data.niche]||NICHES['Lifestyle'];
-  document.getElementById('nicheIcon').textContent = n.icon;
-  document.getElementById('nicheName').textContent = data.niche.toUpperCase();
-  document.getElementById('nicheConf').innerHTML = '✓ <span>'+data.confidence+'% confidence</span> · '+Math.min(50,data.posts.length)+' posts analyzed';
-  document.getElementById('confPct').textContent = data.confidence+'%';
+  var n=NICHES[data.niche]||NICHES['Lifestyle'];
+  document.getElementById('nicheIcon').textContent=n.icon;
+  document.getElementById('nicheName').textContent=data.niche.toUpperCase();
+  document.getElementById('nicheConf').innerHTML='✓ <span>'+data.confidence+'% confidence</span> · '+Math.min(50,data.posts.length)+' posts analyzed';
+  document.getElementById('confPct').textContent=data.confidence+'%';
   setTimeout(function(){document.getElementById('confBar').style.width=data.confidence+'%';},400);
-  document.getElementById('nicheTags').innerHTML = n.tags.map(function(t,i){
+  document.getElementById('nicheTags').innerHTML=n.tags.map(function(t,i){
     return '<span class="tag'+(i===0?' hl':'')+'">'+t+'</span>';
   }).join('');
- 
-  // Apriori Rules
-  document.getElementById('ruleList').innerHTML = data.aprioriRules.map(function(r){
+
+  // Apriori
+  document.getElementById('ruleList').innerHTML=data.aprioriRules.map(function(r){
     return '<div class="rule-item">'
       +'<div class="rule-ant"><span class="bold">{'+r.ant+'}</span>'
       +'<span class="rule-arrow"> ⟹ </span>'
       +'<span class="rule-con bold">{'+r.con+'}</span></div>'
       +'<div class="rule-conf">conf:'+r.conf.toFixed(2)+'</div>'
-      +'<div class="rule-lift">lift:'+r.lift.toFixed(1)+'x</div>'
-      +'</div>';
+      +'<div class="rule-lift">lift:'+r.lift.toFixed(1)+'x</div></div>';
   }).join('');
- 
+
   // Hashtag cloud
-  var htFreq = data.hashtagFreq;
-  var maxF = htFreq[0]?htFreq[0][1]:1;
-  document.getElementById('hashtagCloud').innerHTML = htFreq.map(function(entry){
-    var pct = entry[1]/maxF;
-    var sz = pct>0.7?'s4':pct>0.45?'s3':pct>0.25?'s2':'s1';
-    return '<span class="htag '+sz+'">'+esc(entry[0])+'</span>';
-  }).join('');
-  if(!htFreq.length) document.getElementById('hashtagCloud').innerHTML='<span style="font-family:DM Mono,monospace;font-size:12px;color:var(--muted)">No hashtags found in recent posts.</span>';
- 
-  // Best times heatmap
-  var bt = data.bestTimes;
-  var DAYS = ['SUN','MON','TUE','WED','THU','FRI','SAT'];
-  var hmHtml = '';
+  var htFreq=data.hashtagFreq; var maxF=htFreq[0]?htFreq[0][1]:1;
+  document.getElementById('hashtagCloud').innerHTML=htFreq.length
+    ?htFreq.map(function(e){var pct=e[1]/maxF;var sz=pct>.7?'s4':pct>.45?'s3':pct>.25?'s2':'s1';return'<span class="htag '+sz+'">#'+esc(e[0])+'</span>';}).join('')
+    :'<span style="font-family:DM Mono,monospace;font-size:12px;color:var(--muted)">No hashtags found.</span>';
+
+  // Heatmap
+  var bt=data.bestTimes; var DAYS=['SUN','MON','TUE','WED','THU','FRI','SAT'];
+  var hmHtml='';
   for(var d=0;d<7;d++){
-    hmHtml += '<div style="display:flex;align-items:center;gap:6px;margin-bottom:5px">';
-    hmHtml += '<div style="font-family:DM Mono,monospace;font-size:9px;color:var(--text2);width:28px;letter-spacing:1px">'+DAYS[d]+'</div>';
-    hmHtml += '<div style="display:flex;gap:3px;flex:1">';
+    hmHtml+='<div style="display:flex;align-items:center;gap:6px;margin-bottom:5px">';
+    hmHtml+='<div style="font-family:DM Mono,monospace;font-size:9px;color:var(--text2);width:30px;letter-spacing:1px">'+DAYS[d]+'</div>';
+    hmHtml+='<div style="display:flex;gap:3px;flex:1">';
     for(var s=0;s<6;s++){
-      var v = bt.grid[d][s]||0;
-      var heatClass = v>0.75?'heat4':v>0.5?'heat3':v>0.25?'heat2':v>0?'heat1':'';
-      hmHtml += '<div style="flex:1;height:14px;border-radius:3px;background:'+(heatClass?'':' var(--bg4)')+'" class="hour-block'+( heatClass?' '+heatClass:'')+'"></div>';
+      var v=bt.grid[d][s]||0;
+      var hc=v>.75?'heat4':v>.5?'heat3':v>.25?'heat2':v>0?'heat1':'';
+      hmHtml+='<div style="flex:1" class="hour-block'+(hc?' '+hc:'')+'"></div>';
     }
-    hmHtml += '</div></div>';
+    hmHtml+='</div></div>';
   }
-  document.getElementById('heatmapGrid').innerHTML = hmHtml;
- 
+  document.getElementById('heatmapGrid').innerHTML=hmHtml;
+
   // Performance table
-  var avgE = parseFloat(data.engRate)||0;
-  document.getElementById('perfBody').innerHTML = data.posts.slice(0,12).map(function(v){
-    var er = followersCount>0?((v.likes+v.comments)/followersCount*100).toFixed(2):'0.00';
-    var erClass = er>avgE*1.5?'eng-high':er>avgE*0.7?'eng-mid':'eng-low';
-    var erLabel = er>avgE*1.5?'HIGH':er>avgE*0.7?'AVG':'LOW';
-    var typeClass = v.mediaType==='reel'?'type-reel':v.mediaType==='carousel'?'type-carousel':'type-photo';
-    var typeLabel = v.mediaType==='reel'?'📽 REEL':v.mediaType==='carousel'?'🔁 CAROUSEL':'🖼 PHOTO';
-    var cap = v.caption?v.caption.slice(0,55)+(v.caption.length>55?'…':''):'(no caption)';
-    return '<tr>'
-      +'<td class="title-cell">'+esc(cap)+'</td>'
-      +'<td><span class="post-type-badge '+typeClass+'">'+typeLabel+'</span></td>'
+  var avgE=parseFloat(data.engRate)||0;
+  document.getElementById('perfBody').innerHTML=data.posts.slice(0,12).map(function(v){
+    var er=followersCount>0?((v.likes+v.comments)/followersCount*100).toFixed(2):'0.00';
+    var erClass=er>avgE*1.5?'eng-high':er>avgE*0.7?'eng-mid':'eng-low';
+    var erLabel=er>avgE*1.5?'HIGH':er>avgE*0.7?'AVG':'LOW';
+    var typeMap={reel:'type-reel 📽 REEL',carousel:'type-carousel 🔁 CAROUSEL',video:'type-video 📹 VIDEO',photo:'type-photo 🖼 PHOTO'};
+    var typeStr=typeMap[v.mediaType]||'type-photo 🖼 PHOTO'; var parts=typeStr.split(' '); var tClass=parts[0]; var tLabel=parts.slice(1).join(' ');
+    var cap=v.caption?v.caption.slice(0,55)+(v.caption.length>55?'…':''):'(no caption)';
+    return '<tr><td class="title-cell">'+esc(cap)+'</td>'
+      +'<td><span class="post-type-badge '+tClass+'">'+tLabel+'</span></td>'
       +'<td style="color:var(--text)">'+fmtNum(v.likes)+'</td>'
       +'<td style="color:var(--text)">'+fmtNum(v.comments)+'</td>'
       +'<td style="color:var(--purple)">'+er+'%</td>'
       +'<td style="color:var(--text2)">'+v.hashtags.length+'</td>'
-      +'<td><span class="eng-badge '+erClass+'">'+erLabel+'</span></td>'
-      +'</tr>';
+      +'<td><span class="eng-badge '+erClass+'">'+erLabel+'</span></td></tr>';
   }).join('');
- 
-  // Charts & Chat
+
+  // Charts
   Object.values(charts).forEach(function(c){c.destroy();}); charts={};
   renderCharts(data);
+
+  // Growth panels (local fallback while Gemini loads)
+  renderLocalGrowthPanels(data);
+
   document.getElementById('chatFab').classList.add('visible');
   initChat(data);
 }
- 
-/* ════════════════════════════════
+
+/* ══════════════════════════════════
    CHARTS
-   ════════════════════════════════ */
+══════════════════════════════════ */
 function renderCharts(d){
-  Chart.defaults.color = '#9090a8';
-  Chart.defaults.font.family = "'DM Mono',monospace";
- 
-  // Line chart
-  var lc = document.getElementById('lineChart').getContext('2d');
-  var gL = lc.createLinearGradient(0,0,0,250);
-  gL.addColorStop(0,'rgba(131,58,180,0.3)'); gL.addColorStop(1,'rgba(131,58,180,0)');
-  var gP = lc.createLinearGradient(0,0,0,250);
-  gP.addColorStop(0,'rgba(225,48,108,0.25)'); gP.addColorStop(1,'rgba(225,48,108,0)');
-  charts.line = new Chart(lc,{type:'line',data:{labels:d.monthlyData.labels,datasets:[
+  Chart.defaults.color='#9090a8'; Chart.defaults.font.family="'DM Mono',monospace";
+  var lc=document.getElementById('lineChart').getContext('2d');
+  var gL=lc.createLinearGradient(0,0,0,250);
+  gL.addColorStop(0,'rgba(131,58,180,.3)'); gL.addColorStop(1,'rgba(131,58,180,0)');
+  var gP=lc.createLinearGradient(0,0,0,250);
+  gP.addColorStop(0,'rgba(225,48,108,.25)'); gP.addColorStop(1,'rgba(225,48,108,0)');
+  charts.line=new Chart(lc,{type:'line',data:{labels:d.monthlyData.labels,datasets:[
     {label:'Avg Likes',data:d.monthlyData.likesData,borderColor:'#833AB4',backgroundColor:gL,borderWidth:2,pointRadius:3,pointBackgroundColor:'#833AB4',tension:.4,fill:true,yAxisID:'y'},
     {label:'Avg Comments',data:d.monthlyData.commentsData,borderColor:'#E1306C',backgroundColor:gP,borderWidth:2,pointRadius:3,pointBackgroundColor:'#E1306C',tension:.4,fill:true,yAxisID:'y1'},
   ]},options:{responsive:true,interaction:{mode:'index',intersect:false},
     plugins:{legend:{position:'top',labels:{boxWidth:8,usePointStyle:true,pointStyle:'circle'}}},
-    scales:{x:{grid:{color:'rgba(255,255,255,0.04)'},border:{color:'rgba(255,255,255,0.06)'}},
-      y:{position:'left',grid:{color:'rgba(255,255,255,0.04)'},ticks:{callback:function(v){return fmtNum(v)}}},
-      y1:{position:'right',grid:{drawOnChartArea:false},ticks:{callback:function(v){return fmtNum(v)}}}}}});
- 
-  // Radar
-  var rc = document.getElementById('radarChart').getContext('2d');
-  charts.radar = new Chart(rc,{type:'radar',data:{labels:['Engagement','Consistency','Hashtags','Captions','Content Mix','Growth'],
-    datasets:[{data:d.radarScores,borderColor:'#E1306C',backgroundColor:'rgba(225,48,108,0.1)',borderWidth:2,pointBackgroundColor:'#E1306C',pointRadius:4}]},
+    scales:{x:{grid:{color:'rgba(255,255,255,.04)'},border:{color:'rgba(255,255,255,.06)'}},
+      y:{position:'left',grid:{color:'rgba(255,255,255,.04)'},ticks:{callback:function(v){return fmtNum(v);}}},
+      y1:{position:'right',grid:{drawOnChartArea:false},ticks:{callback:function(v){return fmtNum(v);}}}}}});
+  var rc=document.getElementById('radarChart').getContext('2d');
+  charts.radar=new Chart(rc,{type:'radar',data:{labels:['Engagement','Consistency','Hashtags','Captions','Content Mix','Growth'],
+    datasets:[{data:d.radarScores,borderColor:'#E1306C',backgroundColor:'rgba(225,48,108,.1)',borderWidth:2,pointBackgroundColor:'#E1306C',pointRadius:4}]},
     options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
-      scales:{r:{angleLines:{color:'rgba(255,255,255,0.06)'},grid:{color:'rgba(255,255,255,0.06)'},
-        pointLabels:{font:{size:10},color:'#9090a8'},ticks:{display:false},min:0,max:100,
-        backgroundColor:'rgba(0,0,0,0.1)'}}}});
- 
-  // Donut
-  var dc = document.getElementById('donutChart').getContext('2d');
-  charts.donut = new Chart(dc,{type:'doughnut',data:{labels:Object.keys(d.contentMix),datasets:[{
-    data:Object.values(d.contentMix),
-    backgroundColor:['#833AB4','#E1306C','#F77737'],
+      scales:{r:{angleLines:{color:'rgba(255,255,255,.06)'},grid:{color:'rgba(255,255,255,.06)'},
+        pointLabels:{font:{size:10},color:'#9090a8'},ticks:{display:false},min:0,max:100,backgroundColor:'rgba(0,0,0,.1)'}}}});
+  var dc=document.getElementById('donutChart').getContext('2d');
+  charts.donut=new Chart(dc,{type:'doughnut',data:{labels:Object.keys(d.contentMix),datasets:[{
+    data:Object.values(d.contentMix),backgroundColor:['#833AB4','#E1306C','#F77737'],
     borderColor:'#0d0b18',borderWidth:3,hoverOffset:7}]},
     options:{responsive:true,maintainAspectRatio:false,cutout:'70%',
       plugins:{legend:{position:'bottom',labels:{boxWidth:8,padding:14,usePointStyle:true,pointStyle:'circle',font:{size:11}}}}}});
 }
- 
-/* ════════════════════════════════
-   AI CHATBOT (Gemini)
-   ════════════════════════════════ */
-function initChat(data){
-  chatHistory = [];
-  document.getElementById('chatMsgs').innerHTML = '';
-  var p = data.profile;
-  addBotMsg('👋 Analysis complete for <strong>@'+esc(p.username)+'</strong>!\n\nThis is a <strong>'+data.niche+'</strong> account with <strong>'+fmtNum(p.followers)+' followers</strong> and a <strong>'+data.engRate+'% engagement rate</strong>.\n\nWhat would you like to know?');
-  var chips = [
-    'Why is the engagement rate '+data.engRate+'%?',
-    'What hashtag strategy should they use?',
-    'How to grow faster in '+data.niche+'?',
-    'What content type performs best?',
-  ];
-  document.getElementById('chatSuggestions').innerHTML = chips.map(function(q){
-    return '<div class="chat-chip" onclick="quickChat(\''+q.replace(/'/g,"\\'")+'\')" >'+q+'</div>';
+
+/* ══════════════════════════════════
+   AI GROWTH STRATEGY — LOCAL ENGINE
+══════════════════════════════════ */
+function renderLocalGrowthPanels(data){
+  var strategy=buildLocalGrowthStrategy(data);
+  renderGrowthStrategies(strategy.strategies,data.isNewAccount,'LOCAL');
+  renderContentIdeas(strategy.contentIdeas,data.niche);
+  renderPostingPlan(data);
+  renderViralTips(strategy.viralTips,data);
+  renderHashtagSets(data.niche);
+}
+
+function buildLocalGrowthStrategy(data){
+  var p=data.profile; var er=parseFloat(data.engRate); var mix=data.contentMix;
+  var posts=data.posts; var niche=data.niche; var strategies=[]; var viralTips=[];
+  var total=Object.values(mix).reduce(function(s,v){return s+v;},0)||1;
+  var reelPct=(mix.Reels||0)/total;
+  var avgHt=posts.length?posts.reduce(function(s,p){return s+p.hashtags.length;},0)/posts.length:0;
+
+  if(data.isNewAccount){
+    strategies.push({icon:'🌱',priority:'HIGH',title:'Define Your Niche First',desc:'Before posting, pick ONE specific niche. Generalist accounts grow 3x slower. Based on your bio, "'+niche+'" looks like your space — commit to it for 30 days.'});
+    strategies.push({icon:'📅',priority:'HIGH',title:'Post Daily for First 30 Days',desc:'New accounts need consistency above everything. Post 1 Reel + 1 Story daily for 30 days. The algorithm rewards new accounts that stay active.'});
+    strategies.push({icon:'📽',priority:'HIGH',title:'Start with Reels Exclusively',desc:'Reels get 3x more reach than photos for new accounts. Every piece of content should be a Reel. Target 15–30 seconds with trending audio.'});
+    strategies.push({icon:'🤝',priority:'MED',title:'Engage Before You Post',desc:'30 minutes before posting, like and comment on 10 posts in your niche. This warms the algorithm and surfaces your account to active users.'});
+    strategies.push({icon:'🏷',priority:'MED',title:'Use 20 Niche Hashtags',desc:'New accounts should use 20 targeted hashtags. Avoid mega-tags like #love. Mix 5 large (1M+), 10 medium (100K–500K), 5 micro (<50K) tags per post.'});
+  } else {
+    if(er<1){
+      strategies.push({icon:'📉',priority:'CRITICAL',title:'Critical: Fix Engagement Now',desc:'Your '+er+'% engagement is critically below the 1% floor. Pin a question as your first comment on every post. Reply to every comment within 60 minutes of posting. Use interactive Stories (polls, sliders) daily.'});
+    } else if(er<3){
+      strategies.push({icon:'📊',priority:'HIGH',title:'Boost Below-Benchmark Engagement',desc:'At '+er+'%, you\'re below the 3% Instagram benchmark. End every caption with a specific question. Try "This or That" carousel posts — they drive 2x more comments than standard posts.'});
+    } else {
+      strategies.push({icon:'🔥',priority:'MAINTAIN',title:'Strong Engagement — Scale Reach',desc:'Excellent '+er+'% engagement rate! Your audience is highly active. Shift focus to reach: collaborate with 2–3 accounts in the '+niche+' space monthly. Cross-promotion is your fastest growth lever now.'});
+    }
+    if(reelPct<0.4){
+      strategies.push({icon:'📽',priority:'HIGH',title:'Post 4–5 Reels Per Week',desc:'Reels are only '+Math.round(reelPct*100)+'% of your content mix. Instagram\'s algorithm shows Reels to non-followers — it\'s your primary discovery engine. Shift to 60–70% Reels in your content mix.'});
+    }
+    if(avgHt<10){
+      strategies.push({icon:'🏷',priority:'HIGH',title:'Increase to 15–20 Hashtags',desc:'You\'re averaging only '+Math.round(avgHt)+' hashtags per post. Use 15–20 targeted tags every time. Mix large (1M+), medium (100K–1M), and niche-specific (<100K) hashtags. Place them in the first comment to keep captions clean.'});
+    } else if(avgHt>25){
+      strategies.push({icon:'🏷',priority:'MED',title:'Trim to 15–20 Quality Hashtags',desc:'You\'re using '+Math.round(avgHt)+' hashtags — that\'s over the optimal range. Instagram can penalize hashtag spam. Remove generic oversaturated tags and keep only the 15–20 most targeted ones for your niche.'});
+    }
+    var bestDay=getBestPostingDay(data.bestTimes);
+    strategies.push({icon:'⏰',priority:'MED',title:'Optimize to '+bestDay+' Evenings',desc:'Your engagement heatmap shows peak activity on '+bestDay+'. Post between 6PM–9PM in your audience\'s primary timezone. Schedule content in advance using Meta Business Suite.'});
+    var avgCap=posts.length?posts.reduce(function(s,p){return s+p.caption.length;},0)/posts.length:0;
+    if(avgCap<80){
+      strategies.push({icon:'✍️',priority:'MED',title:'Add a Hook Line to Captions',desc:'Your captions average only '+Math.round(avgCap)+' chars. The first line must stop the scroll. Try: "I spent 30 days doing X and here\'s what happened." Short hook → value → CTA. This alone can boost saves by 40%.'});
+    }
+    var emojiPct=posts.filter(function(p){return p.hasEmoji;}).length/(posts.length||1);
+    if(emojiPct<0.5){
+      strategies.push({icon:'😊',priority:'LOW',title:'Add Emojis to Captions',desc:'Only '+Math.round(emojiPct*100)+'% of your posts use emojis. Emojis increase caption CTR by ~15% by breaking up text and adding visual cues. Use 2–3 per caption, never more than 5.'});
+    }
+  }
+
+  viralTips=buildViralTips(data);
+  return {strategies:strategies,contentIdeas:getNicheContentIdeas(niche,data.isNewAccount),viralTips:viralTips};
+}
+
+function getBestPostingDay(bestTimes){
+  var DAYS=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  var dayTotals=bestTimes.grid.map(function(row){return row.reduce(function(s,v){return s+v;},0);});
+  var maxIdx=dayTotals.indexOf(Math.max.apply(null,dayTotals));
+  return DAYS[maxIdx]||'Tuesday';
+}
+
+function buildViralTips(data){
+  var tips=[]; var er=parseFloat(data.engRate); var mix=data.contentMix;
+  var total=Object.values(mix).reduce(function(s,v){return s+v;},0)||1;
+  tips.push({icon:'🎵',title:'Use Trending Audio on Reels',desc:'Browse Instagram\'s audio library and filter by "Trending." Reels using trending audio get 30–40% more reach on average. Check what top accounts in '+data.niche+' are using this week.'});
+  tips.push({icon:'📌',title:'Pin Your 3 Best Posts',desc:'Pinned posts appear first on your profile. Pin your 3 highest-performing posts to immediately build credibility with new visitors. Update pinned posts every 60 days.'});
+  if(er<3){
+    tips.push({icon:'💬',title:'Reply to Comments in First Hour',desc:'Instagram boosts posts that generate rapid engagement. Reply to every comment within 60 minutes of posting. Ask follow-up questions to keep the conversation going and signal activity to the algorithm.'});
+  }
+  tips.push({icon:'📖',title:'Use Stories as a Warm-Up Loop',desc:'Post 3–5 Stories before your main feed post. Stories prime your audience and boost your account\'s visibility score right before you post. Use polls or questions in Stories to spike engagement metrics.'});
+  if((mix.Carousels||0)/total<0.2){
+    tips.push({icon:'🔁',title:'Add More Carousels (Saves Machine)',desc:'Carousels drive 3x more saves than single images. Every save signals high value to Instagram. Create "swipe to see more" carousels for tips, before/after, or step-by-step content in your '+data.niche+' niche.'});
+  }
+  tips.push({icon:'🤳',title:'Collaborate via Collab Posts',desc:'Use Instagram\'s Collab feature to co-author posts with creators in adjacent niches. Collab posts appear on both feeds simultaneously, giving you access to their entire audience with zero extra effort.'});
+  return tips.slice(0,5);
+}
+
+function getNicheContentIdeas(niche,isNew){
+  var ideas={
+    'Fitness & Health':{reels:['Day in my life as a [niche] athlete — real meals + workouts shown','5 exercises you\'re doing WRONG (and the fix)','What I eat to maintain my physique — no BS version'],posts:['Progress photo: week 1 vs week 12 — the honest truth','My exact 5-day workout split for beginners','Myth vs Fact: 5 fitness lies you\'ve been told'],hooks:['Stop wasting time at the gym — do this instead','I was making all 5 of these mistakes (are you?)','The exact diet that helped me lose 10kg in 60 days']},
+    'Fashion & Style':{reels:['GRWM for [occasion] — from basic to polished in 10 mins','I styled one piece 5 different ways (total game changer)','Shop my entire outfit under ₹2000 — thrift haul'],posts:['Capsule wardrobe essentials you\'re probably missing','How I dress for my body type — what actually works','Best & worst: honest review of [brand] pieces'],hooks:['You\'ve been dressing your body type wrong — here\'s how to fix it','This one styling trick makes any outfit look expensive','I spent ₹500 and looked like I spent ₹5000'],},
+    'Food & Cooking':{reels:['This 5-ingredient meal changed my weeknight cooking forever','I recreated [viral food] at home — here\'s the real recipe','ASMR cooking: making [dish] from scratch with no shortcuts'],posts:['My meal prep for the whole week — saves 4 hours on Sunday','5 mistakes everyone makes cooking [dish] and how to fix them','Restaurant review: was the viral [restaurant] worth it?'],hooks:['Stop making pasta this way — try this instead','The one ingredient that makes everything taste better','I cooked every meal at home for 30 days and here\'s what happened']},
+    'Travel':{reels:['48 hours in [city] — everything you NEED to see','I found a hidden gem in [place] that nobody talks about','Travel hack that saved me ₹15,000 on flights'],posts:['My honest review of [destination] — not what you see on Instagram','Complete packing list for [trip type] — only what I actually used','Budget breakdown: how I traveled to [place] for [amount]'],hooks:['Everyone goes to [popular spot] — but you should actually go here','I\'ve been to 20 countries and this is the best hidden gem','How I booked a 5-star hotel for the price of a hostel']},
+    'Business':{reels:['I made ₹[X] from Instagram — here\'s the exact strategy','3 business mistakes I made in year 1 (avoid these)','A day in my life running a [type] business — raw version'],posts:['The framework I used to go from 0 to [milestone]','10 tools I use daily to run my business efficiently','Honest income report: what actually worked this month'],hooks:['I quit my job with no savings — here\'s what happened 1 year later','This ONE change tripled my revenue in 30 days','The business advice nobody gives you until you fail']},
+    'Art & Creative':{reels:['Watch me create [artwork] from start to finish — full process','My 3-year art journey: the REAL before and after','Tools every [art type] artist needs — honest review'],posts:['Step-by-step guide to [technique] for beginners','My creative process: how I go from blank canvas to final piece','Art vs commission: what clients actually expect'],hooks:['I drew every day for 365 days — here\'s what changed','The one technique that made my art go from basic to professional','My client said "it\'s not what I expected" — story time']},
+    'Entertainment':{reels:['POV: you discover [relatable scenario] — wait for the end','I tried [viral trend] so you don\'t have to','The most underrated [movie/show/thing] nobody is talking about'],posts:['Ranking every [popular series] episode from worst to best','Hot take: [opinion about entertainment topic]','[Movie/Show] predictions — who\'s going to be right?'],hooks:['This show has a 97% rating and NOBODY is watching it','I have the most controversial opinion about [popular topic]','You\'ve been watching [show] completely wrong']},
+    'Technology':{reels:['5 AI tools that replaced apps I paid for — free alternatives','I automated my entire workflow — here\'s how (step by step)','Setting up the ultimate [tech setup] under ₹[budget]'],posts:['Honest review: is [tool/device] actually worth the hype?','Beginner\'s guide to [tech topic] — zero jargon','The tech mistake that cost me [consequence] and what I learned'],hooks:['This free AI tool does what [paid app] charges ₹[X] for','I tested 10 [tech products] so you don\'t have to waste money','The one Chrome extension that changed how I work forever']},
+    'Lifestyle':{reels:['My realistic morning routine as a [role] — no 5AM fantasy','Day in my life: honest version (not the aesthetic one)','I tried [challenge] for 30 days — my honest results'],posts:['10 habits that actually changed my life after 6 months','My minimalist setup: what I got rid of and why','Reading list that genuinely shifted my mindset this year'],hooks:['I stopped [bad habit] for 30 days and here\'s what happened','The morning routine change that gave me 2 extra hours','Nobody talks about the downside of [popular lifestyle trend]']},
+    'Education':{reels:['Explain [complex topic] in 60 seconds — I bet you never knew this','5 facts about [topic] that will change how you think','The [subject] concept that took me 2 years to understand — simplified'],posts:['Complete beginner\'s guide to [topic] — bookmark this','The best FREE resources to learn [skill] in 2025','Myth-busting: 5 things you believe about [topic] that are wrong'],hooks:['You\'ve been taught [concept] wrong your whole life','This [topic] fact sounds fake but is completely true','I learned [skill] in 30 days using only free resources — here\'s how']},
+  };
+  var fallback={reels:['Day in my life — real and unfiltered version','I tried [viral trend] — honest results','Behind the scenes of how I create content'],posts:['Things nobody tells you about [topic]','What I wish I knew when I started','My top 5 tools and why I use them'],hooks:['Stop scrolling — you need to hear this','I made a mistake so you don\'t have to','The thing everyone gets wrong about [topic]']};
+  var base=ideas[niche]||fallback;
+  if(isNew){
+    base.hooks=['Hi! I\'m [name] and I help [audience] achieve [result] without [pain point]','Follow along as I document my journey from [start point] to [goal]','This account is about [topic] — here\'s what you\'ll get by following me'];
+  }
+  return base;
+}
+
+/* ══════════════════════════════════
+   RENDER GROWTH PANELS
+══════════════════════════════════ */
+function renderGrowthStrategies(strategies,isNew,source){
+  document.getElementById('aiSourceBadge').textContent=source==='GEMINI'?'✨ GEMINI AI':'⚡ SMART AI';
+  document.getElementById('starterBanner').style.display=isNew?'block':'none';
+  document.getElementById('growthStrategies').innerHTML=strategies.map(function(s){
+    return '<div class="strategy-card">'
+      +'<div class="strategy-icon-wrap">'+s.icon+'</div>'
+      +'<div><div class="strategy-meta">'
+      +'<div class="strategy-title">'+esc(s.title)+'</div>'
+      +'<span class="priority-badge priority-'+s.priority+'">'+s.priority+'</span>'
+      +'</div><div class="strategy-desc">'+esc(s.desc)+'</div></div></div>';
   }).join('');
 }
- 
+
+function renderContentIdeas(ideas,niche){
+  document.getElementById('contentIdeasSub').textContent='PERSONALIZED FOR '+niche.toUpperCase();
+  var makeItems=function(arr,type){ return arr.map(function(t,i){
+    if(type==='hooks') return '<div class="idea-hook" onclick="copyHook(this)" title="Click to copy">🎣 '+esc(t)+'</div>';
+    return '<div class="idea-item"><div class="idea-num">IDEA '+(i+1)+'</div><div class="idea-text">'+esc(t)+'</div></div>';
+  }).join('');};
+  document.getElementById('ideas-reels').innerHTML=makeItems(ideas.reels,'reels');
+  document.getElementById('ideas-posts').innerHTML=makeItems(ideas.posts,'posts');
+  document.getElementById('ideas-hooks').innerHTML=makeItems(ideas.hooks,'hooks');
+}
+
+function switchTab(tab,el){
+  document.querySelectorAll('.ideas-tab').forEach(function(t){t.classList.remove('active');});
+  document.querySelectorAll('.ideas-section').forEach(function(s){s.classList.remove('active');});
+  el.classList.add('active');
+  document.getElementById('ideas-'+tab).classList.add('active');
+}
+
+function copyHook(el){
+  var text=el.textContent.replace('🎣 ','');
+  navigator.clipboard.writeText(text).then(function(){showToast('Hook copied to clipboard!');}).catch(function(){});
+}
+
+function renderPostingPlan(data){
+  var DAYS=[
+    {name:'MON',active:true},  {name:'TUE',active:false},
+    {name:'WED',active:true},  {name:'THU',active:true},
+    {name:'FRI',active:false}, {name:'SAT',active:true},
+    {name:'SUN',active:false},
+  ];
+  var bt=data.bestTimes;
+  var weeklyGrid=bt.grid.slice(0,7);
+  var isoToGrid=[0,1,2,3,4,5,6]; // Sun=0 in grid, but show Mon-Sun
+  // Find best slot per day
+  function bestSlot(dayIdx){ var row=weeklyGrid[dayIdx]; var max=0,maxS=4; row.forEach(function(v,s){if(v>max){max=v;maxS=s;}}); return maxS; }
+  var slotTimes=['6:00 AM','9:00 AM','12:00 PM','3:00 PM','6:00 PM','9:00 PM'];
+  // Mon=1..Sun=0 in Date.getDay()
+  var dayGridIdx=[1,2,3,4,5,6,0]; // Mon,Tue,Wed,Thu,Fri,Sat,Sun
+  document.getElementById('postingPlanBody').innerHTML=DAYS.map(function(d,i){
+    var gi=dayGridIdx[i]; var bs=bestSlot(gi); var bestTime=slotTimes[bs];
+    var dayScore=weeklyGrid[gi].reduce(function(s,v){return s+v;},0);
+    var isHot=dayScore>weeklyGrid.reduce(function(s,r){return s+r.reduce(function(a,v){return a+v;},0);},0)/7;
+    var chips='';
+    if(d.active){
+      if(i%3===0) chips+='<span class="plan-chip plan-chip-reel">📽 Reel</span>';
+      else if(i%3===1) chips+='<span class="plan-chip plan-chip-post">🖼 Post</span>';
+      else chips+='<span class="plan-chip plan-chip-reel">📽 Reel</span>';
+      chips+='<span class="plan-chip plan-chip-story">📖 Story</span>';
+    } else {
+      chips='<span class="plan-chip plan-chip-rest">— Rest</span>';
+    }
+    return '<div class="plan-day'+(isHot&&d.active?' active-day':'')+'"><div class="plan-day-name">'+d.name+'</div>'
+      +'<div class="plan-slot">'+chips+'</div>'
+      +(d.active?'<div class="plan-time">'+bestTime+'</div>':'')+'</div>';
+  }).join('');
+}
+
+function renderViralTips(tips,data){
+  document.getElementById('viralTipsBody').innerHTML=tips.map(function(t){
+    return '<div class="tip-card">'
+      +'<div class="tip-icon">'+t.icon+'</div>'
+      +'<div class="tip-content">'
+      +'<div class="tip-title">'+esc(t.title)+'</div>'
+      +'<div class="tip-desc">'+esc(t.desc)+'</div>'
+      +'</div></div>';
+  }).join('');
+}
+
+function renderHashtagSets(niche){
+  var sets=NICHE_HASHTAGS[niche]||NICHE_HASHTAGS['Lifestyle'];
+  var html='';
+  var categories=[
+    {key:'large', label:'LARGE (1M+ posts)', desc:'For reach'},
+    {key:'medium',label:'MEDIUM (100K–1M)', desc:'For targeting'},
+    {key:'niche', label:'NICHE (<100K)',     desc:'For conversion'},
+  ];
+  categories.forEach(function(cat){
+    var tags=sets[cat.key]||[];
+    html+='<div class="htag-set">'
+      +'<div class="htag-set-label">'+cat.label+' <span class="htag-set-count">'+cat.desc+'</span></div>'
+      +'<div class="htag-set-tags">'+tags.map(function(t){return'<span class="htag-set-tag" onclick="copyTag(this)">'+esc(t)+'</span>';}).join('')+'</div>'
+      +'</div>';
+  });
+  var allTags=[].concat(sets.large||[],sets.medium||[],sets.niche||[]).join(' ');
+  html+='<button class="copy-all-btn" onclick="copyAllTags(\''+esc(allTags)+'\')">📋 COPY ALL '+([].concat(sets.large||[],sets.medium||[],sets.niche||[]).length)+' HASHTAGS</button>';
+  document.getElementById('hashtagSetBody').innerHTML=html;
+}
+
+function copyTag(el){ navigator.clipboard.writeText(el.textContent).then(function(){showToast('Hashtag copied!');}).catch(function(){}); }
+function copyAllTags(tags){ navigator.clipboard.writeText(tags).then(function(){showToast('All hashtags copied!');}).catch(function(){}); }
+
+/* ══════════════════════════════════
+   GEMINI AI GROWTH STRATEGY (async upgrade)
+══════════════════════════════════ */
+async function generateAndRenderGrowthStrategy(data){
+  try{
+    var result=await callGeminiGrowthStrategy(data);
+    renderGrowthStrategies(result.strategies,data.isNewAccount,'GEMINI');
+    if(result.contentIdeas&&result.contentIdeas.reels){
+      renderContentIdeas(result.contentIdeas,data.niche);
+    }
+    if(result.viralTips&&result.viralTips.length){
+      var tipsFormatted=result.viralTips.map(function(t){
+        if(typeof t==='string') return{icon:'🔥',title:t.slice(0,40),desc:t};
+        return t;
+      });
+      renderViralTips(tipsFormatted,data);
+    }
+    if(result.hashtagSets&&result.hashtagSets.large){
+      renderGeminiHashtagSets(result.hashtagSets,data.niche);
+    }
+  }catch(e){
+    // Local fallback already rendered — silently keep it
+  }
+}
+
+async function callGeminiGrowthStrategy(data){
+  var p=data.profile;
+  var avgHt=data.posts.length?data.posts.reduce(function(s,p){return s+p.hashtags.length;},0)/data.posts.length:0;
+  var mix=data.contentMix;
+  var topRule=data.aprioriRules[0];
+  var prompt='You are an expert Instagram growth strategist. Analyze this account and provide SPECIFIC, ACTIONABLE recommendations.\n\n'
+    +'REAL ACCOUNT DATA:\n'
+    +'Username: @'+p.username+' | Niche: '+data.niche+' ('+data.confidence+'% confidence)\n'
+    +'Followers: '+fmtNum(p.followers)+' | Engagement: '+data.engRate+'%'+(parseFloat(data.engRate)>=3?' (above 3% benchmark)':' (below 3% benchmark)')+'\n'
+    +'Avg Likes: '+fmtNum(data.avgLikes)+' | Avg Comments: '+fmtNum(data.avgComments)+'\n'
+    +'Posting Frequency: '+data.postFreq+'\n'
+    +'Content Mix: Photos:'+((mix.Photos||0))+', Reels:'+((mix.Reels||0))+', Carousels:'+((mix.Carousels||0))+'\n'
+    +'Avg Hashtags: '+Math.round(avgHt)+' per post\n'
+    +'Top Apriori Pattern: '+(topRule?'{'+topRule.ant+'} → {'+topRule.con+'} (lift '+topRule.lift+'x)':'N/A')+'\n'
+    +'Is new account: '+data.isNewAccount+'\n\n'
+    +'Return ONLY valid JSON (no markdown, no extra text) with this exact structure:\n'
+    +'{\n'
+    +'  "strategies": [{"icon":"emoji","priority":"CRITICAL|HIGH|MED|LOW|MAINTAIN","title":"short title max 5 words","desc":"2-3 specific sentences referencing their data"}],\n'
+    +'  "contentIdeas": {"reels":["idea1","idea2","idea3"],"posts":["idea1","idea2","idea3"],"hooks":["hook1","hook2","hook3"]},\n'
+    +'  "viralTips": [{"icon":"emoji","title":"tip title","desc":"specific actionable tip"}],\n'
+    +'  "hashtagSets": {"large":["#tag1","#tag2","#tag3","#tag4"],"medium":["#tag1","#tag2","#tag3","#tag4"],"niche":["#tag1","#tag2","#tag3","#tag4"]}\n'
+    +'}\n\n'
+    +'Generate exactly 5 strategies, 3 content ideas per type, 4 viral tips, 4 hashtags per tier. All specific to @'+p.username+'\'s '+data.niche+' account.';
+
+  var res=await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key='+getGemKey(),{
+    method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({contents:[{role:'user',parts:[{text:prompt}]}],generationConfig:{maxOutputTokens:2000}})
+  });
+  var j=await res.json();
+  var raw=j.candidates?.[0]?.content?.parts?.[0]?.text||'{}';
+  return JSON.parse(raw.replace(/```json|```/g,'').trim());
+}
+
+function renderGeminiHashtagSets(sets,niche){
+  var html='';
+  var categories=[
+    {key:'large', label:'LARGE (1M+ posts)', desc:'For reach'},
+    {key:'medium',label:'MEDIUM (100K–1M)', desc:'For targeting'},
+    {key:'niche', label:'NICHE (<100K)',     desc:'For conversion'},
+  ];
+  categories.forEach(function(cat){
+    var tags=sets[cat.key]||[];
+    html+='<div class="htag-set">'
+      +'<div class="htag-set-label">'+cat.label+' <span class="htag-set-count">'+cat.desc+'</span></div>'
+      +'<div class="htag-set-tags">'+tags.map(function(t){return'<span class="htag-set-tag" onclick="copyTag(this)">'+esc(t)+'</span>';}).join('')+'</div>'
+      +'</div>';
+  });
+  var allTags=[].concat(sets.large||[],sets.medium||[],sets.niche||[]).join(' ');
+  html+='<button class="copy-all-btn" onclick="copyAllTags(\''+esc(allTags)+'\')">📋 COPY ALL '+([].concat(sets.large||[],sets.medium||[],sets.niche||[]).length)+' HASHTAGS</button>';
+  document.getElementById('hashtagSetBody').innerHTML=html;
+}
+
+/* ══════════════════════════════════
+   AI CHATBOT
+══════════════════════════════════ */
+function initChat(data){
+  chatHistory=[]; document.getElementById('chatMsgs').innerHTML='';
+  var p=data.profile;
+  addBotMsg('👋 Analysis complete for <strong>@'+esc(p.username)+'</strong>!\n\n'
+    +'This is a <strong>'+data.niche+'</strong> account with <strong>'+fmtNum(p.followers)+' followers</strong> '
+    +'and a <strong>'+data.engRate+'% engagement rate</strong>.'
+    +(data.isNewAccount?'\n\n🌱 <strong>New account detected</strong> — I\'ve activated your Starter Growth Plan above!':'\n\nAsk me anything about growing this account.')
+  );
+  document.getElementById('chatSuggestions').innerHTML=[
+    'Why is the engagement '+data.engRate+'%?',
+    'What hashtag strategy should I use?',
+    'How to grow faster in '+data.niche+'?',
+    'What\'s the best posting time?',
+  ].map(function(q){return'<div class="chat-chip" onclick="quickChat(\''+q.replace(/'/g,"\\'")+'\')" >'+q+'</div>';}).join('');
+}
+
 function buildChatContext(d){
-  var p = d.profile;
-  var topRules = (d.aprioriRules||[]).slice(0,3).map(function(r){
-    return '{'+r.ant+'} → {'+r.con+'} (conf:'+r.conf.toFixed(2)+', lift:'+r.lift.toFixed(1)+'x)';
-  }).join('; ');
-  var radarLbls = ['Engagement','Consistency','Hashtags','Captions','ContentMix','Growth'];
-  var radarStr = (d.radarScores||[]).map(function(s,i){return radarLbls[i]+':'+s+'/100';}).join(', ');
-  var topHtags = (d.hashtagFreq||[]).slice(0,8).map(function(e){return e[0]+'('+e[1]+'x)';}).join(', ');
-  var mix = Object.entries(d.contentMix||{}).map(function(e){return e[0]+':'+e[1];}).join(', ');
-  return 'You are InstaIQ AI, an expert Instagram growth strategist and engagement analyst.\n'
-    +'Use ONLY this real account data — be specific, never generic.\n'
-    +'ACCOUNT: @'+p.username+' | NAME: '+(p.fullName||p.username)+'\n'
-    +'NICHE: '+d.niche+' ('+d.confidence+'% confidence)\n'
+  var p=d.profile;
+  var topRules=(d.aprioriRules||[]).slice(0,3).map(function(r){return'{'+r.ant+'} → {'+r.con+'} (conf:'+r.conf.toFixed(2)+', lift:'+r.lift.toFixed(1)+'x)';}).join('; ');
+  var radarLbls=['Engagement','Consistency','Hashtags','Captions','ContentMix','Growth'];
+  var radarStr=(d.radarScores||[]).map(function(s,i){return radarLbls[i]+':'+s+'/100';}).join(', ');
+  var topHtags=(d.hashtagFreq||[]).slice(0,8).map(function(e){return e[0]+'('+e[1]+'x)';}).join(', ');
+  var mix=Object.entries(d.contentMix||{}).map(function(e){return e[0]+':'+e[1];}).join(', ');
+  return 'You are InstaIQ AI, an expert Instagram growth strategist. Use ONLY this real account data — be specific, never generic.\n'
+    +'ACCOUNT: @'+p.username+' | NICHE: '+d.niche+' ('+d.confidence+'% confidence)\n'
     +'FOLLOWERS: '+fmtNum(p.followers)+' | FOLLOWING: '+fmtNum(p.following)+' | POSTS: '+fmtNum(p.mediaCount)+'\n'
-    +'ENGAGEMENT RATE: '+d.engRate+'% '+(parseFloat(d.engRate)>=3?'(above 3% benchmark — strong)':'(below 3% benchmark — needs work)')+'\n'
+    +'ENGAGEMENT: '+d.engRate+'% '+(parseFloat(d.engRate)>=3?'(above 3% benchmark)':'(below 3% benchmark — critical focus area)')+'\n'
     +'AVG LIKES: '+fmtNum(d.avgLikes)+' | AVG COMMENTS: '+fmtNum(d.avgComments)+'\n'
-    +'POSTING FREQUENCY: '+d.postFreq+'\n'
-    +'CONTENT MIX: '+mix+'\n'
+    +'POSTING FREQUENCY: '+d.postFreq+' | CONTENT MIX: '+mix+'\n'
     +'TOP HASHTAGS: '+topHtags+'\n'
     +'APRIORI PATTERNS: '+topRules+'\n'
     +'RADAR SCORES: '+radarStr+'\n'
-    +'CATEGORY: '+(p.category||'Not set')+' | VERIFIED: '+p.isVerified+' | BUSINESS: '+p.isBusiness+'\n'
-    +'RULES: Be direct, reference real data. 3-5 sentences max. Bold **key numbers**. Always base advice on patterns above.';
+    +'NEW ACCOUNT: '+d.isNewAccount+'\n'
+    +'RULES: Be direct. Reference real numbers. 3–5 sentences max. Bold **key figures**. Always personalize advice to this specific account.';
 }
- 
+
 function toggleChat(){
-  var panel = document.getElementById('chatPanel');
+  var panel=document.getElementById('chatPanel');
   panel.classList.toggle('open');
-  if(panel.classList.contains('open')) document.getElementById('chatInput').focus();
+  if(panel.classList.contains('open'))document.getElementById('chatInput').focus();
 }
 function quickChat(q){ document.getElementById('chatInput').value=q; sendChat(); }
+
 function addBotMsg(text){
-  var m = document.getElementById('chatMsgs');
-  var d = document.createElement('div'); d.className='msg bot';
+  var m=document.getElementById('chatMsgs');
+  var d=document.createElement('div'); d.className='msg bot';
   d.innerHTML='<div class="msg-avatar">✨</div><div class="msg-bubble">'+text.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>')+'</div>';
   m.appendChild(d); m.scrollTop=m.scrollHeight;
 }
 function addUserMsg(text){
-  var m = document.getElementById('chatMsgs');
-  var d = document.createElement('div'); d.className='msg user';
+  var m=document.getElementById('chatMsgs');
+  var d=document.createElement('div'); d.className='msg user';
   d.innerHTML='<div class="msg-bubble">'+esc(text)+'</div><div class="msg-avatar">👤</div>';
   m.appendChild(d); m.scrollTop=m.scrollHeight;
 }
 function showTyping(show){
-  var m = document.getElementById('chatMsgs'), t = document.getElementById('typingDot');
-  if(show&&!t){ t=document.createElement('div'); t.id='typingDot'; t.className='msg bot';
+  var m=document.getElementById('chatMsgs'),t=document.getElementById('typingDot');
+  if(show&&!t){t=document.createElement('div');t.id='typingDot';t.className='msg bot';
     t.innerHTML='<div class="msg-avatar">✨</div><div class="msg-bubble"><div class="chat-typing show"><span></span><span></span><span></span></div></div>';
-    m.appendChild(t); m.scrollTop=m.scrollHeight; }
-  else if(!show&&t) t.remove();
+    m.appendChild(t);m.scrollTop=m.scrollHeight;}
+  else if(!show&&t)t.remove();
 }
 async function sendChat(){
-  var inp = document.getElementById('chatInput');
-  var txt = inp.value.trim(); if(!txt) return;
+  var inp=document.getElementById('chatInput');
+  var txt=inp.value.trim(); if(!txt)return;
   inp.value=''; inp.style.height='auto';
   document.getElementById('chatSendBtn').disabled=true;
   addUserMsg(txt); chatHistory.push({role:'user',content:txt});
-  var sys = accountContext ? buildChatContext(accountContext) : 'You are InstaIQ AI, an expert Instagram growth strategist. Be concise and data-driven.';
+  var sys=accountContext?buildChatContext(accountContext):'You are InstaIQ AI, an expert Instagram growth strategist. Be concise and data-driven.';
   showTyping(true);
   try{
-    var gemHist = chatHistory.slice(0,-1).map(function(h){return{role:h.role==='assistant'?'model':'user',parts:[{text:h.content}]};});
-    var res = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key='+getGemKey(),{
+    var gemHist=chatHistory.slice(0,-1).map(function(h){return{role:h.role==='assistant'?'model':'user',parts:[{text:h.content}]};});
+    var res=await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key='+getGemKey(),{
       method:'POST',headers:{'Content-Type':'application/json'},
       body:JSON.stringify({system_instruction:{parts:[{text:sys}]},contents:gemHist.concat([{role:'user',parts:[{text:txt}]}]),generationConfig:{maxOutputTokens:400}})
     });
-    var j = await res.json();
-    var reply = j.candidates?.[0]?.content?.parts?.[0]?.text || "I couldn't generate a response right now.";
+    var j=await res.json();
+    var reply=j.candidates?.[0]?.content?.parts?.[0]?.text||"I couldn't generate a response right now.";
     chatHistory.push({role:'assistant',content:reply}); showTyping(false); addBotMsg(reply);
-  } catch(e){
-    showTyping(false); addBotMsg('⚠️ AI unavailable: '+(e.message||'Unknown error')+'. Please try again.');
+  }catch(e){
+    showTyping(false);
+    addBotMsg('⚠️ AI unavailable: '+(e.message||'Unknown error')+'. Please try again.');
   }
   document.getElementById('chatSendBtn').disabled=false;
 }
- 
-/* ════════════════════════════════
-   API KEY MANAGEMENT
-   ════════════════════════════════ */
-function openApiModal(){
-  document.getElementById('apiModal').classList.add('open');
-  var saved = getRapidKey();
-  if(saved) document.getElementById('rapidKeyInput').value=saved;
-  updateApiStatus();
-}
-function closeApiModal(){ document.getElementById('apiModal').classList.remove('open'); }
-function updateApiStatus(){
-  var key = getRapidKey();
-  var dot = document.getElementById('apiDot');
-  var lbl = document.getElementById('apiSetupLabel');
-  if(key){ dot.classList.add('live'); lbl.textContent='API Key Active'; }
-  else { dot.classList.remove('live'); lbl.textContent='Setup API Key'; }
-}
-async function saveApiKey(){
-  var raw = document.getElementById('rapidKeyInput').value.trim();
-  if(!raw){ setKeyMsg('Please enter your RapidAPI key.','var(--pink)'); return; }
-  var btn = document.getElementById('saveKeyBtn');
-  btn.disabled=true; btn.textContent='VERIFYING KEY…';
-  setKeyMsg('Testing connection to RapidAPI…','var(--yellow)');
-  // Quick verification — try a known endpoint
-  try{
-    localStorage.setItem('instaiq_rapid_key', raw);
-    var res = await fetch('https://instagram-scraper-api2.p.rapidapi.com/v1/info?username_or_id_or_url=instagram',{
-      headers:{'x-rapidapi-key':raw,'x-rapidapi-host':'instagram-scraper-api2.p.rapidapi.com'}
-    });
-    if(res.status===401||res.status===403){ localStorage.removeItem('instaiq_rapid_key'); throw new Error('Invalid API key.'); }
-    // Any 2xx or 4xx (not auth) = key works
-    setKeyMsg('✅ API key verified and saved!','var(--green)');
-    updateApiStatus();
-    setTimeout(closeApiModal, 1200);
-  } catch(e){
-    localStorage.removeItem('instaiq_rapid_key');
-    setKeyMsg('❌ '+(e.message||'Key verification failed.'),'var(--pink)');
-  }
-  btn.disabled=false; btn.textContent='SAVE & VERIFY KEY →';
-}
-function setKeyMsg(msg,color){ var el=document.getElementById('keyStatusMsg'); el.textContent=msg; el.style.color=color||'var(--text2)'; }
- 
-// Init
-updateApiStatus();
+
+/* ══════════════════════════════════
+   INIT
+══════════════════════════════════ */
+checkSession();
 </script>
 </body>
 </html>
