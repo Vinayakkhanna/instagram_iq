@@ -3,10 +3,14 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
+const crypto = require('crypto');
 
 const app = express();
 const PORT = Number(process.env.PORT || 3000);
 const META_GRAPH_VERSION = process.env.META_GRAPH_VERSION || 'v22.0';
+const ENGAGEMENT_BENCHMARK = 3;
+const HIGH_ENGAGEMENT_MULTIPLIER = 6;
+const LOW_ENGAGEMENT_MULTIPLIER = 10;
 
 app.use(cors());
 app.use(express.json({ limit: '1mb' }));
@@ -77,7 +81,9 @@ function inferNiche(profileText) {
 }
 
 function buildInsights({ reelPct, avgEr, topHour, followers, postCount }) {
-  const erImpact = avgEr >= 3 ? `+${Math.round(avgEr * 6)}% profile actions` : `+${Math.round(avgEr * 10)}% growth opportunity`;
+  const erImpact = avgEr >= ENGAGEMENT_BENCHMARK
+    ? `+${Math.round(avgEr * HIGH_ENGAGEMENT_MULTIPLIER)}% profile actions`
+    : `+${Math.round(avgEr * LOW_ENGAGEMENT_MULTIPLIER)}% growth opportunity`;
   const reelImpact = `+${Math.max(8, Math.round(reelPct * 0.6))}% potential reach`;
   return [
     {
@@ -242,6 +248,7 @@ function buildAnalyticsPayload(metaData) {
 async function fetchMetaProfile() {
   const accessToken = process.env.META_ACCESS_TOKEN;
   const businessId = process.env.META_IG_BUSINESS_ID;
+  const appSecret = process.env.META_APP_SECRET;
   if (!accessToken || !businessId) {
     throw new Error('Missing META_ACCESS_TOKEN or META_IG_BUSINESS_ID in server environment');
   }
@@ -261,6 +268,10 @@ async function fetchMetaProfile() {
     fields,
     access_token: accessToken,
   });
+  if (appSecret) {
+    const appSecretProof = crypto.createHmac('sha256', appSecret).update(accessToken).digest('hex');
+    params.set('appsecret_proof', appSecretProof);
+  }
   const url = `https://graph.facebook.com/${META_GRAPH_VERSION}/${businessId}?${params.toString()}`;
   const response = await fetch(url);
   const json = await response.json();
@@ -273,7 +284,12 @@ async function fetchMetaProfile() {
 }
 
 app.get('/api/health', (_req, res) => {
-  res.json({ ok: true });
+  res.json({
+    ok: true,
+    metaConfigured: Boolean(process.env.META_ACCESS_TOKEN && process.env.META_IG_BUSINESS_ID),
+    metaAppConfigured: Boolean(process.env.META_APP_ID && process.env.META_APP_SECRET),
+    aiConfigured: Boolean(process.env.GEMINI_API_KEY),
+  });
 });
 
 app.get('/api/instagram/profile', async (_req, res) => {
@@ -298,10 +314,13 @@ app.post('/api/ai/generate', async (req, res) => {
 
   for (const model of models) {
     try {
-      const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(geminiKey)}`;
+      const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`;
       const response = await fetch(endpoint, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'x-goog-api-key': geminiKey,
+        },
         body: JSON.stringify(payload),
       });
       const json = await response.json();
@@ -320,14 +339,6 @@ app.post('/api/ai/generate', async (req, res) => {
   }
 
   return res.status(502).json({ error: lastError });
-});
-
-app.get('/data-deletion', (_req, res) => {
-  res.sendFile(path.join(__dirname, 'data-deletion', 'index.html'));
-});
-
-app.get('/', (_req, res) => {
-  res.sendFile(path.join(__dirname, 'index.html'));
 });
 
 app.listen(PORT, () => {
