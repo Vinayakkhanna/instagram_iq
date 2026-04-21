@@ -8,9 +8,43 @@ const crypto = require('crypto');
 const app = express();
 const PORT = Number(process.env.PORT || 3000);
 const META_GRAPH_VERSION = process.env.META_GRAPH_VERSION || 'v22.0';
-const ENGAGEMENT_BENCHMARK = 3;
-const HIGH_ENGAGEMENT_MULTIPLIER = 6;
-const LOW_ENGAGEMENT_MULTIPLIER = 10;
+const ENGAGEMENT_RATE_THRESHOLD = 3;
+const HIGH_ENGAGEMENT_IMPACT_MULTIPLIER = 6;
+const LOW_ENGAGEMENT_IMPACT_MULTIPLIER = 10;
+const MIN_REEL_IMPACT = 8;
+const REEL_IMPACT_MULTIPLIER = 0.6;
+const POSTING_WINDOW_MULTIPLIER = 0.15;
+const HASHTAG_REACH_BASE = 0.08;
+const HASHTAG_REACH_PER_OCCURRENCE = 0.03;
+const HASHTAG_MULTIPLIER_BASE = 1;
+const HASHTAG_MULTIPLIER_PER_OCCURRENCE = 0.2;
+const HASHTAG_MULTIPLIER_POSITION_STEP = 0.05;
+const FALLBACK_HASHTAG_REACH_RATE = 0.1;
+const FALLBACK_HASHTAG_MULTIPLIER = 1.1;
+const VIRAL_SCORE_ENGAGEMENT_WEIGHT = 14;
+const VIRAL_SCORE_REELS_WEIGHT = 0.35;
+const VIRAL_SCORE_MIN = 10;
+const VIRAL_SCORE_MAX = 99;
+const RADAR_ENGAGEMENT_WEIGHT = 12;
+const RADAR_ENGAGEMENT_MIN = 5;
+const RADAR_ENGAGEMENT_MAX = 100;
+const RADAR_CONSISTENCY_BASE = 40;
+const RADAR_CONSISTENCY_POSTS_WEIGHT = 8;
+const RADAR_CONSISTENCY_MIN = 20;
+const RADAR_CONSISTENCY_MAX = 100;
+const RADAR_SEO_HASHTAG_WEIGHT = 15;
+const RADAR_SEO_MIN = 20;
+const RADAR_SEO_MAX = 95;
+const RADAR_VISUAL_BASE = 35;
+const RADAR_VISUAL_MIN = 20;
+const RADAR_VISUAL_MAX = 95;
+const RADAR_GROWTH_OFFSET = 8;
+const RADAR_GROWTH_MIN = 10;
+const RADAR_GROWTH_MAX = 99;
+const RADAR_RETENTION_BASE = 30;
+const RADAR_RETENTION_INTERACTION_WEIGHT = 1000;
+const RADAR_RETENTION_MIN = 10;
+const RADAR_RETENTION_MAX = 95;
 
 app.use(cors());
 app.use(express.json({ limit: '1mb' }));
@@ -81,10 +115,10 @@ function inferNiche(profileText) {
 }
 
 function buildInsights({ reelPct, avgEr, topHour, followers, postCount }) {
-  const erImpact = avgEr >= ENGAGEMENT_BENCHMARK
-    ? `+${Math.round(avgEr * HIGH_ENGAGEMENT_MULTIPLIER)}% profile actions`
-    : `+${Math.round(avgEr * LOW_ENGAGEMENT_MULTIPLIER)}% growth opportunity`;
-  const reelImpact = `+${Math.max(8, Math.round(reelPct * 0.6))}% potential reach`;
+  const erImpact = avgEr >= ENGAGEMENT_RATE_THRESHOLD
+    ? `+${Math.round(avgEr * HIGH_ENGAGEMENT_IMPACT_MULTIPLIER)}% profile actions`
+    : `+${Math.round(avgEr * LOW_ENGAGEMENT_IMPACT_MULTIPLIER)}% growth opportunity`;
+  const reelImpact = `+${Math.max(MIN_REEL_IMPACT, Math.round(reelPct * REEL_IMPACT_MULTIPLIER))}% potential reach`;
   return [
     {
       title: 'Reel strategy signal',
@@ -101,7 +135,7 @@ function buildInsights({ reelPct, avgEr, topHour, followers, postCount }) {
     {
       title: 'Best posting window',
       summary: `Your highest post activity is around ${topHour}:00 local profile time, useful for scheduling tests.`,
-      impact: `~${Math.round(Math.max(1, postCount) * 0.15)} extra engaged sessions`,
+      impact: `~${Math.round(Math.max(1, postCount) * POSTING_WINDOW_MULTIPLIER)} extra engaged sessions`,
       support: 'Timestamp clustering from recent posts',
     },
     {
@@ -178,23 +212,35 @@ function buildAnalyticsPayload(metaData) {
   const hashtags = hashtagsTop.length
     ? hashtagsTop.map(([tag, count], idx) => ({
         tag,
-        reach: Math.round(Math.max(1, followers) * (0.08 + count * 0.03)),
-        mult: Number((1 + count * 0.2 + idx * 0.05).toFixed(1)),
+        reach: Math.round(Math.max(1, followers) * (HASHTAG_REACH_BASE + count * HASHTAG_REACH_PER_OCCURRENCE)),
+        mult: Number((HASHTAG_MULTIPLIER_BASE + count * HASHTAG_MULTIPLIER_PER_OCCURRENCE + idx * HASHTAG_MULTIPLIER_POSITION_STEP).toFixed(1)),
       }))
-    : [{ tag: '#instagram', reach: Math.round(followers * 0.1), mult: 1.1 }];
+    : [{ tag: '#instagram', reach: Math.round(followers * FALLBACK_HASHTAG_REACH_RATE), mult: FALLBACK_HASHTAG_MULTIPLIER }];
 
   const topHourIndex = hourBucket.reduce((best, value, index, arr) => (value > arr[best] ? index : best), 0);
   const nicheSource = `${metaData.biography || ''} ${recentMedia.map((m) => m.caption || '').join(' ')}`;
   const niche = inferNiche(nicheSource);
   const confidence = clamp(hashtagsTop.length ? 90 : 78, 70, 97);
-  const viralScore = clamp(Math.round(engRate * 14 + contentMix.Reels * 0.35), 10, 99);
+  const viralScore = clamp(
+    Math.round(engRate * VIRAL_SCORE_ENGAGEMENT_WEIGHT + contentMix.Reels * VIRAL_SCORE_REELS_WEIGHT),
+    VIRAL_SCORE_MIN,
+    VIRAL_SCORE_MAX
+  );
   const radarScores = [
-    clamp(Math.round(engRate * 12), 5, 100),
-    clamp(40 + Math.round((postData.reduce((a, b) => a + b, 0) / Math.max(postData.length, 1)) * 8), 20, 100),
-    clamp(hashtagsTop.length * 15, 20, 95),
-    clamp(35 + contentMix.Photos, 20, 95),
-    clamp(viralScore - 8, 10, 99),
-    clamp(30 + Math.round((followers > 0 ? avgInteractions / followers : 0) * 1000), 10, 95),
+    clamp(Math.round(engRate * RADAR_ENGAGEMENT_WEIGHT), RADAR_ENGAGEMENT_MIN, RADAR_ENGAGEMENT_MAX),
+    clamp(
+      RADAR_CONSISTENCY_BASE + Math.round((postData.reduce((a, b) => a + b, 0) / Math.max(postData.length, 1)) * RADAR_CONSISTENCY_POSTS_WEIGHT),
+      RADAR_CONSISTENCY_MIN,
+      RADAR_CONSISTENCY_MAX
+    ),
+    clamp(hashtagsTop.length * RADAR_SEO_HASHTAG_WEIGHT, RADAR_SEO_MIN, RADAR_SEO_MAX),
+    clamp(RADAR_VISUAL_BASE + contentMix.Photos, RADAR_VISUAL_MIN, RADAR_VISUAL_MAX),
+    clamp(viralScore - RADAR_GROWTH_OFFSET, RADAR_GROWTH_MIN, RADAR_GROWTH_MAX),
+    clamp(
+      RADAR_RETENTION_BASE + Math.round((followers > 0 ? avgInteractions / followers : 0) * RADAR_RETENTION_INTERACTION_WEIGHT),
+      RADAR_RETENTION_MIN,
+      RADAR_RETENTION_MAX
+    ),
   ];
 
   const insights = buildInsights({
