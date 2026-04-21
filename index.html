@@ -717,7 +717,7 @@ footer .g{background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-
         <span style="font-size:20px">📸</span> Continue with Instagram
       </button>
       <div class="dev-note">
-        <strong>✅ Real API Connected:</strong> Clicking "Continue with Instagram" pulls <strong>live data</strong> for <strong>@velixo_edits</strong> via the Instagram Graph API (Business account ID: 17841439005652255). For other accounts, GramIQ uses an intelligent mock engine. Token refreshes monthly via Meta developers console.
+        <strong>✅ Real API Connected:</strong> Clicking "Continue with Instagram" now pulls <strong>live data</strong> through a secure backend that integrates with the Meta Graph API. API credentials are server-side only.
       </div>
       <p class="modal-note">Only public Instagram accounts or approved test users can be analyzed</p>
     </div>
@@ -760,86 +760,19 @@ footer .g{background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-
    Real API (velixo_edits) + Mock fallback + Gemini AI
    ═══════════════════════════════════════════════════ */
 
-// ── Real Instagram Credentials (velixo_edits) ──
-const IG_TOKEN = 'EAARoDGfWrOUBRCdvypHkJ1ZCjXGBbR1G5V3CTLDTZAJXJvm3rOrRp1fyyZCbZCIgcLT4ZAi2ZARrY6V2doFUEHD5OyHeZALI9FPFKyV6pUDwHfvCvE4rufxu6rAlf0Y4heGQDtZAIVV70A3vXNRHvnhbTndWsufpxHDLJmZAmdvjXVdmhSVKkKJj3Wa5ADsdSQN7q';
-const IG_BUSINESS_ID = '17841439005652255';
-const OWNER_USERNAME = 'velixo_edits';
-
-// ── Gemini Config ──
-var _gk1='AIzaSyAxWuWntzZjSX9',_gk2='ZQ4N12fKIH1NvyDpzTG8';
-function getGemKey(){return _gk1+_gk2}
+// ── Backend-owned integration config ──
+let OWNER_USERNAME = 'velixo_edits';
 
 /* ══════════════════════════════════════
    REAL INSTAGRAM API ENGINE
-   Fetches live data for velixo_edits via
-   Instagram Graph API (Business account)
+   Fetches live data via backend
    ══════════════════════════════════════ */
 async function fetchInstagramData(){
-  const fields=[
-    'username','name','followers_count','media_count','profile_picture_url',
-    'media{id,caption,media_type,media_url,permalink,like_count,comments_count,timestamp}'
-  ].join(',');
-  const url=`https://graph.facebook.com/v22.0/${IG_BUSINESS_ID}?fields=${fields}&access_token=${IG_TOKEN}`;
-  const res=await fetch(url);
+  const res=await fetch('/api/instagram/profile');
   const json=await res.json();
-  if(json.error)throw new Error('Instagram API: '+json.error.message);
-
-  const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-  const labels=[],engData=[],postData=[],reachData=[];
-  for(let i=5;i>=0;i--){
-    const d=new Date();d.setMonth(d.getMonth()-i);
-    labels.push(months[d.getMonth()]);
-    engData.push(parseFloat((Math.random()*2+2).toFixed(2)));
-    postData.push(Math.max(1,Math.floor((json.media_count||0)/12)));
-    reachData.push(Math.round((json.followers_count||1000)*(0.06+Math.random()*0.1)));
-  }
-
-  const media=json.media?.data||[];
-  const followers=json.followers_count||1;
-  // Compute engagement rate from most recent 5 posts
-  const recent5=media.slice(0,5);
-  const avgEr=recent5.length
-    ? parseFloat((recent5.reduce((s,m)=>s+((m.like_count||0)+(m.comments_count||0)),0)/recent5.length/followers*100).toFixed(2))
-    : 2.5;
-
-  return{
-    username:'@'+(json.username||OWNER_USERNAME),
-    displayName:json.name||json.username||'Velixo Edits',
-    niche:'Art & Creative',
-    confidence:94,
-    followers,
-    following:570,
-    posts:json.media_count||0,
-    engRate:avgEr,
-    viralScore:88,
-    avatarColor:'#7209b7',
-    profilePicture:json.profile_picture_url||'',
-    labels,engData,postData,reachData,
-    contentMix:{Reels:70,Carousels:20,Photos:10},
-    radarScores:[85,90,75,95,88,80],
-    insights:[
-      {title:'High Reel Engagement',summary:'Cinematic edits are driving 3x more saves than static images on this account.',impact:'+42% reach',support:'Live API data'},
-      {title:'Peak Posting Time',summary:'Audience is most active at 8 PM IST based on engagement patterns.',impact:'+18% likes',support:'Engagement timing'},
-      {title:'Strong Visual Consistency',summary:'Cohesive aesthetic across posts drives +35% profile visits per reel view.',impact:'+35% profile visits',support:'Content analysis'},
-      {title:'Hashtag Performance',summary:'Niche-specific tags like #cinematic and #vfx show 2.4x reach multiplier.',impact:'2.4x reach',support:'Hashtag data'},
-    ],
-    hashtags:[
-      {tag:'#velixo',reach:Math.round(followers*2.4),mult:2.4},
-      {tag:'#cinematic',reach:Math.round(followers*1.8),mult:1.8},
-      {tag:'#vfx',reach:Math.round(followers*1.5),mult:1.5},
-      {tag:'#videoediting',reach:Math.round(followers*1.3),mult:1.3},
-      {tag:'#reels',reach:Math.round(followers*1.1),mult:1.1},
-    ],
-    recentPosts:media.slice(0,10).map(m=>({
-      caption:(m.caption||'No caption').slice(0,80),
-      type:m.media_type==='VIDEO'?'reel':'photo',
-      likes:m.like_count||0,
-      comments:m.comments_count||0,
-      er:parseFloat(((((m.like_count||0)+(m.comments_count||0))/followers)*100).toFixed(2)),
-      permalink:m.permalink||'',
-    })),
-    isRealData:true,
-  };
+  if(!res.ok||json.error)throw new Error(json.error||'Instagram backend error');
+  OWNER_USERNAME=json.ownerUsername||OWNER_USERNAME;
+  return json;
 }
 
 // ── Niche data ──
@@ -1254,19 +1187,15 @@ function renderContentCalendar(d){
    GEMINI AI
    ══════════════════════════════════════ */
 async function callGeminiAPI(payload){
-  const models=['gemini-2.0-flash','gemini-1.5-flash'];
-  let lastErr='Unknown error';
-  for(const m of models){
-    try{
-      const res=await fetch('https://generativelanguage.googleapis.com/v1beta/models/'+m+':generateContent?key='+getGemKey(),{
-        method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
-      const j=await res.json();
-      if(!res.ok){lastErr=(j?.error?.message)||('HTTP '+res.status);continue}
-      const text=j?.candidates?.[0]?.content?.parts?.[0]?.text||'';
-      if(text)return text;lastErr='No text generated';
-    }catch(e){lastErr=e?.message||String(e)}
-  }
-  throw new Error(lastErr);
+  const res=await fetch('/api/ai/generate',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify(payload)
+  });
+  const j=await res.json();
+  if(!res.ok)throw new Error((j&&j.error)||('HTTP '+res.status));
+  if(!j.text)throw new Error('No text generated');
+  return j.text;
 }
 function extractJSONArray(text){
   const s=text.replace(/```json|```/g,'').trim();
