@@ -138,7 +138,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:cen
 .profile-avatar{width:76px;height:76px;border-radius:50%;flex-shrink:0;overflow:hidden;position:relative;
   background:var(--grad);display:flex;align-items:center;justify-content:center;
   font-family:'Syne',sans-serif;font-size:28px;font-weight:800;color:#fff}
-.profile-avatar::before{content:'';position:absolute;inset:-3px;border-radius:50%;background:var(--grad);z-index:-1}
+.profile-avatar::before{content:'external-url-marker';position:absolute;inset:-3px;border-radius:50%;background:var(--grad);z-index:-1}
 .profile-avatar img{width:100%;height:100%;object-fit:cover;border-radius:50%;display:block}
 .profile-meta h2{font-family:'Syne',sans-serif;font-size:28px;font-weight:800;letter-spacing:-0.5px}
 .profile-meta p{font-size:13px;color:var(--text2);font-family:'DM Mono',monospace;margin-top:4px}
@@ -760,6 +760,9 @@ footer .g{background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-
    Real API (velixo_edits) + Mock fallback + Gemini AI
    ═══════════════════════════════════════════════════ */
 
+// ── INTEGRATED RENDER API BASE URL ──
+const API_BASE_URL = 'https://instagram-iq.onrender.com';
+
 // ── Backend-owned integration config ──
 let OWNER_USERNAME = 'velixo_edits';
 
@@ -768,7 +771,7 @@ let OWNER_USERNAME = 'velixo_edits';
    Fetches live data via backend
    ══════════════════════════════════════ */
 async function fetchInstagramData(){
-  const res=await fetch('/api/instagram/profile');
+  const res=await fetch(`${API_BASE_URL}/api/instagram/profile`);
   const json=await res.json();
   if(!res.ok||json.error)throw new Error(json.error||'Instagram backend error');
   OWNER_USERNAME=json.ownerUsername||OWNER_USERNAME;
@@ -1187,7 +1190,7 @@ function renderContentCalendar(d){
    GEMINI AI
    ══════════════════════════════════════ */
 async function callGeminiAPI(payload){
-  const res=await fetch('/api/ai/generate',{
+  const res=await fetch(`${API_BASE_URL}/api/ai/generate`,{
     method:'POST',
     headers:{'Content-Type':'application/json'},
     body:JSON.stringify(payload)
