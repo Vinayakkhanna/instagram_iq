@@ -8,6 +8,8 @@ const crypto = require('crypto');
 const app = express();
 const PORT = Number(process.env.PORT || 3000);
 const META_GRAPH_VERSION = process.env.META_GRAPH_VERSION || 'v22.0';
+
+// Analytics Thresholds & Multipliers
 const ENGAGEMENT_RATE_THRESHOLD = 3;
 const HIGH_ENGAGEMENT_IMPACT_MULTIPLIER = 6;
 const LOW_ENGAGEMENT_IMPACT_MULTIPLIER = 10;
@@ -50,6 +52,7 @@ app.use(cors());
 app.use(express.json({ limit: '1mb' }));
 app.use(express.static(path.join(__dirname)));
 
+// Helper Utilities
 function clamp(v, lo, hi) {
   return Math.max(lo, Math.min(hi, v));
 }
@@ -243,7 +246,7 @@ function buildAnalyticsPayload(metaData) {
     ),
   ];
 
-  const insights = buildInsights({
+  const insightsList = buildInsights({
     reelPct: contentMix.Reels,
     avgEr: engRate,
     topHour: topHourIndex,
@@ -283,7 +286,7 @@ function buildAnalyticsPayload(metaData) {
     reachData,
     contentMix,
     radarScores,
-    insights,
+    insights: insightsList,
     hashtags,
     recentPosts,
     isRealData: true,
@@ -291,34 +294,38 @@ function buildAnalyticsPayload(metaData) {
   };
 }
 
-async function fetchMetaProfile() {
+/**
+ * FIXED: fetchMetaProfile now uses Business Discovery
+ * This is the ONLY way to fetch profile data for a username.
+ */
+async function fetchMetaProfile(targetUsername) {
   const accessToken = process.env.META_ACCESS_TOKEN;
   const businessId = process.env.META_IG_BUSINESS_ID;
   const appSecret = process.env.META_APP_SECRET;
+
   if (!accessToken || !businessId) {
     throw new Error('Missing META_ACCESS_TOKEN or META_IG_BUSINESS_ID in server environment');
   }
 
-  const fields = [
-    'username',
-    'name',
-    'biography',
-    'followers_count',
-    'follows_count',
-    'media_count',
-    'profile_picture_url',
-    'media.limit(50){id,caption,media_type,media_url,permalink,like_count,comments_count,timestamp}',
-  ].join(',');
+  // Determine which user to analyze
+  const username = targetUsername || process.env.OWNER_USERNAME || 'velixo_edits';
+
+  // Build the Discovery Query
+  const discoveryFields = `business_discovery.username(${username}){username,name,biography,followers_count,follows_count,media_count,profile_picture_url,media.limit(50){id,caption,media_type,like_count,comments_count,timestamp,permalink}}`;
 
   const params = new URLSearchParams({
-    fields,
+    fields: discoveryFields,
     access_token: accessToken,
   });
+
+  // Security Proof
   if (appSecret) {
     const appSecretProof = crypto.createHmac('sha256', appSecret).update(accessToken).digest('hex');
     params.set('appsecret_proof', appSecretProof);
   }
+
   const url = `https://graph.facebook.com/${META_GRAPH_VERSION}/${businessId}?${params.toString()}`;
+  
   const response = await fetch(url);
   const json = await response.json();
 
@@ -326,7 +333,13 @@ async function fetchMetaProfile() {
     const msg = json?.error?.message || `Meta API error (${response.status})`;
     throw new Error(msg);
   }
-  return json;
+
+  // The actual data is nested inside the discovery key
+  if (!json.business_discovery) {
+    throw new Error(`Account "${username}" could not be found via Business Discovery.`);
+  }
+
+  return json.business_discovery;
 }
 
 app.get('/api/health', (_req, res) => {
@@ -338,12 +351,17 @@ app.get('/api/health', (_req, res) => {
   });
 });
 
-app.get('/api/instagram/profile', async (_req, res) => {
+/**
+ * FIXED: Route now correctly handles the ?username query parameter
+ */
+app.get('/api/instagram/profile', async (req, res) => {
   try {
-    const metaData = await fetchMetaProfile();
+    const targetUsername = req.query.username ? req.query.username.replace('@', '').trim() : null;
+    const metaData = await fetchMetaProfile(targetUsername);
     const payload = buildAnalyticsPayload(metaData);
     res.json(payload);
   } catch (error) {
+    console.error("Profile Fetch Error:", error.message);
     res.status(502).json({ error: String(error.message || error) });
   }
 });
