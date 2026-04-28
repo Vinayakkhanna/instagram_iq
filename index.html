@@ -852,7 +852,7 @@ function renderDashboard(d){
 
   // Avatar
   const av=document.getElementById('avatarEl');av.innerHTML='';
-  const initials=(d.displayName||d.username||'IG').split(' ').filter(Boolean).map(w=>w[0]).join('').slice(0,2).toUpperCase();
+  const initials=((d.displayName||d.username||'').split(' ').filter(Boolean).map(w=>w[0]).join('').slice(0,2).toUpperCase())||'IG';
   av.innerHTML=`<span style="font-family:'Syne',sans-serif;font-size:26px;font-weight:800">${initials}</span>`;
   av.style.background=d.avatarColor||'var(--pink)';
 
