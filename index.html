@@ -462,14 +462,14 @@ footer .g{background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-
 <section id="hero">
   <div class="hero-eyebrow">✦ Instagram Analytics · AI-Powered</div>
   <h1 class="hero-title">DECODE YOUR<br><span class="g1">INSTAGRAM</span><br>GROWTH</h1>
-  <p class="hero-sub">Enter any public username for deep engagement analysis, niche classification, viral score, and AI-powered content recommendations.</p>
+  <p class="hero-sub">Analyze your connected Instagram account for deep engagement analysis, niche classification, viral score, and AI-powered content recommendations.</p>
   <div class="search-wrap">
     <div class="search-inner">
       <input type="text" id="accountInput" placeholder="@username or handle…" spellcheck="false"
         onkeydown="if(event.key==='Enter')startAnalysis()">
       <button class="btn-analyze" onclick="startAnalysis()">ANALYZE →</button>
     </div>
-    <p class="hint">Try demo: <a href="#" onclick="demoLoad('velixo_edits');return false;">@velixo_edits (LIVE)</a> · <a href="#" onclick="demoLoad('natgeo');return false;">@natgeo</a> · <a href="#" onclick="demoLoad('nasa');return false;">@nasa</a> · <a href="#" onclick="demoLoad('cristiano');return false;">@cristiano</a></p>
+    <p class="hint">Try demo: <a href="#" onclick="demoLoad('velixo_edits');return false;">@velixo_edits (LIVE)</a></p>
   </div>
   <div class="hero-stats">
     <div class="hero-stat"><div class="num">96%</div><div class="lbl">Niche Accuracy</div></div>
@@ -722,8 +722,8 @@ footer .g{background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-
    100% Real API Integration + Gemini AI
    ═══════════════════════════════════════════════════ */
 
-// ── INTEGRATED RENDER API BASE URL ──
-const API_BASE_URL = 'https://instagram-iq.onrender.com';
+// ── API base URL — empty string so requests are relative to the serving host ──
+const API_BASE_URL = '';
 
 // ── Backend-owned integration config ──
 let OWNER_USERNAME = 'velixo_edits';
@@ -852,7 +852,7 @@ function renderDashboard(d){
 
   // Avatar
   const av=document.getElementById('avatarEl');av.innerHTML='';
-  const initials=d.displayName.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+  const initials=(d.displayName||d.username||'IG').split(' ').filter(Boolean).map(w=>w[0]).join('').slice(0,2).toUpperCase();
   av.innerHTML=`<span style="font-family:'Syne',sans-serif;font-size:26px;font-weight:800">${initials}</span>`;
   av.style.background=d.avatarColor||'var(--pink)';
 
