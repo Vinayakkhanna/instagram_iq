@@ -32,8 +32,8 @@ app.use(cors({
 }));
 app.use(express.json({ limit: '64kb' }));
 
-// Serve hardened public assets first, then preserve the existing root dashboard entrypoint.
-app.use(express.static(path.join(__dirname, 'public'), { dotfiles: 'deny', index: 'index.html' }));
+// public/ is reserved for assets. It must not provide an index page; the existing root dashboard is the app entrypoint.
+app.use(express.static(path.join(__dirname, 'public'), { dotfiles: 'deny', index: false }));
 app.use(express.static(__dirname, { dotfiles: 'deny', index: 'index.html' }));
 
 const rateBuckets = new Map();
