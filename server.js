@@ -32,9 +32,11 @@ app.use(cors({
 }));
 app.use(express.json({ limit: '64kb' }));
 
-// public/ is reserved for assets. It must not provide an index page; the existing root dashboard is the app entrypoint.
+// The existing GramIQ dashboard lives at the repository root. Route both common entrypoints explicitly.
+app.get(['/', '/index.html'], (_req, res) => res.sendFile(path.join(__dirname, 'index.html')));
+// Serve public assets without letting public/index.html shadow the dashboard.
 app.use(express.static(path.join(__dirname, 'public'), { dotfiles: 'deny', index: false }));
-app.use(express.static(__dirname, { dotfiles: 'deny', index: 'index.html' }));
+app.use(express.static(__dirname, { dotfiles: 'deny', index: false }));
 
 const rateBuckets = new Map();
 function rateLimit({ windowMs, max }) {
