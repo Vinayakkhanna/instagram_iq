@@ -1,1 +1,0 @@
-The server now serves public/. The dashboard entrypoint should be copied from the repository root index.html into public/index.html.
