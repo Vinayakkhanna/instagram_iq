@@ -1,0 +1,1 @@
+GramIQ dashboard entrypoint is the repository root index.html. The server serves public assets first and the root application second.
